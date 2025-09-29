@@ -1,0 +1,151 @@
+{
+  "personas": [
+    {
+      "nome": "Lucas",
+      "cargo": "Desenvolvedor Frontend",
+      "idade": 45,
+      "experiencia": 22,
+      "habilidades": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Vue.js",
+        "TypeScript",
+        "Otimização de performance",
+        "SEO",
+        "Git"
+      ],
+      "softSkills": [
+        "Boa comunicação",
+        "Trabalho em equipe",
+        "Criatividade",
+        "Resolução de problemas"
+      ]
+    },
+    {
+      "nome": "Ana",
+      "cargo": "Desenvolvedora Backend",
+      "idade": 48,
+      "experiencia": 25,
+      "habilidades": [
+        "Node.js",
+        "Python",
+        "SQL",
+        "NoSQL",
+        "Microserviços",
+        "Docker",
+        "Kubernetes",
+        "Segurança de aplicações"
+      ],
+      "softSkills": [
+        "Pensamento analítico",
+        "Capacidade de liderança",
+        "Adaptabilidade"
+      ]
+    },
+    {
+      "nome": "Carlos",
+      "cargo": "Desenvolvedor Full Stack",
+      "idade": 50,
+      "experiencia": 27,
+      "habilidades": [
+        "JavaScript",
+        "Python",
+        "Java",
+        "Frameworks frontend e backend",
+        "DevOps",
+        "Integração contínua",
+        "Testes automatizados",
+        "GraphQL"
+      ],
+      "softSkills": [
+        "Proatividade",
+        "Mentoria",
+        "Colaboração interdepartamental"
+      ]
+    },
+    {
+      "nome": "Beatriz",
+      "cargo": "Desenvolvedora Mobile",
+      "idade": 43,
+      "experiencia": 20,
+      "habilidades": [
+        "Swift",
+        "Kotlin",
+        "React Native",
+        "Flutter",
+        "Design de interfaces",
+        "Experiência do usuário",
+        "Integração com APIs",
+        "Testes de usabilidade"
+      ],
+      "softSkills": [
+        "Empatia",
+        "Feedback construtivo",
+        "Curiosidade"
+      ]
+    },
+    {
+      "nome": "Fernanda",
+      "cargo": "Analista de Qualidade (QA)",
+      "idade": 42,
+      "experiencia": 20,
+      "habilidades": [
+        "Testes manuais",
+        "Testes automatizados",
+        "Selenium",
+        "Jest",
+        "Criação de casos de teste",
+        "Documentação",
+        "Metodologias ágeis"
+      ],
+      "softSkills": [
+        "Atenção aos detalhes",
+        "Pensamento crítico",
+        "Boa comunicação"
+      ]
+    },
+    {
+      "nome": "Roberto",
+      "cargo": "Coordenador de Equipe",
+      "idade": 55,
+      "experiencia": 30,
+      "habilidades": [
+        "Gestão de projetos",
+        "Metodologias ágeis",
+        "Jira",
+        "Trello",
+        "Definição de KPIs",
+        "Coaching",
+        "Negociação"
+      ],
+      "softSkills": [
+        "Liderança inspiradora",
+        "Empatia",
+        "Visão estratégica"
+      ]
+    },
+    {
+      "nome": "Juliana",
+      "cargo": "Documentadora Técnica",
+      "idade": 40,
+      "experiencia": 22,
+      "habilidades": [
+        "Confluence",
+        "Markdown",
+        "Criação de manuais de usuário",
+        "Guias de instalação",
+        "Metodologias ágeis",
+        "Edição de conteúdo técnico"
+      ],
+      "softSkills": [
+        "Comunicação clara",
+        "Organização",
+        "Gerenciamento de tempo",
+        "Curiosidade"
+      ]
+    }
+  ]
+}
+

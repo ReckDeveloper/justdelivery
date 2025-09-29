@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JustDelivery - Android</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #667eea;
+            color: #333;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #4a5568;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:active {
+            opacity: 0.8;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-row button {
+            width: auto;
+            margin-top: 0;
+            padding: 15px;
+        }
+        
+        .debug {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-row button {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚚 JustDelivery</h1>
+            <p>Sistema de Controle de Entregas - Versão Android</p>
+        </header>
+        
+        <div id="debug" class="debug">
+            Carregando sistema...
+        </div>
+        
+        <!-- Botões de Teste de Emergência -->
+        <div style="background: rgba(255,0,0,0.8); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+            <h3 style="color: white; margin: 0 0 10px 0;">🚨 Testes de Emergência</h3>
+            <button onclick="testeEmergencia()" style="background: #e53e3e; margin: 5px;">Forçar Carregamento</button>
+            <button onclick="limparTudo()" style="background: #d69e2e; margin: 5px;">Limpar Storage</button>
+            <button onclick="mostrarStatus()" style="background: #38a169; margin: 5px;">Mostrar Status</button>
+        </div>
+        
+        <!-- Seção de Pratos do Dia -->
+        <div class="section">
+            <h2>Pratos do Dia</h2>
+            
+            <form id="pratoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nomePrato">Nome do Prato:</label>
+                        <input type="text" id="nomePrato" placeholder="Ex: Arroz, feijão e frango" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="precoPrato">Preço (R$):</label>
+                        <input type="number" id="precoPrato" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <button type="submit">+ Adicionar</button>
+                </div>
+            </form>
+            
+            <div id="pratosList">
+                <!-- Pratos serão listados aqui -->
+            </div>
+        </div>
+        
+        <!-- Seção de Novo Ticket -->
+        <div class="section">
+            <h2>Novo Ticket de Entrega</h2>
+            
+            <form id="deliveryForm">
+                <div class="form-group">
+                    <label for="pratoPrincipal">Prato Principal:</label>
+                    <select id="pratoPrincipal" required>
+                        <option value="">Selecione um prato</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="valorPrato">Valor do Prato:</label>
+                    <input type="text" id="valorPrato" readonly style="background: #f7fafc;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Itens Adicionais:</label>
+                    <div style="padding: 10px 0;">
+                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="refrigerante" value="refrigerante" style="width: auto; margin-right: 10px;">
+                            Refrigerante (+R$ 5,00)
+                        </label>
+                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="sobremesa" value="sobremesa" style="width: auto; margin-right: 10px;">
+                            Sobremesa (+R$ 8,00)
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" id="batata" value="batata" style="width: auto; margin-right: 10px;">
+                            Batata Frita (+R$ 6,00)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="entregador">Entregador:</label>
+                    <select id="entregador" required>
+                        <option value="">Selecione um entregador</option>
+                        <option value="João Silva">João Silva</option>
+                        <option value="Maria Santos">Maria Santos</option>
+                        <option value="Pedro Costa">Pedro Costa</option>
+                        <option value="Ana Oliveira">Ana Oliveira</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dataEntrega">Data da Entrega:</label>
+                    <input type="date" id="dataEntrega" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="horaEntrega">Hora Prevista da Entrega:</label>
+                    <input type="time" id="horaEntrega" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="enderecoEntrega">Endereço de Entrega:</label>
+                    <textarea id="enderecoEntrega" rows="3" placeholder="Endereço completo..." required></textarea>
+                </div>
+                
+                <button type="submit">Criar Ticket de Entrega</button>
+            </form>
+        </div>
+        
+        <!-- Seção de Tickets -->
+        <div class="section">
+            <h2>Tickets de Entrega</h2>
+            <div id="ticketsList">
+                <!-- Tickets serão listados aqui -->
+            </div>
+        </div>
+        
+        <!-- Loading fallback -->
+        <div id="loadingFallback" style="display: none;">
+            Carregando...
+        </div>
+    </div>
+
+    <!-- Debug Console -->
+    <script>
+        var debugDiv = document.getElementById('debug');
+        var originalLog = console.log;
+        console.log = function(message) {
+            originalLog.apply(console, arguments);
+            if (debugDiv) {
+                debugDiv.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '<br>';
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+        };
+        
+        console.log('HTML carregado, iniciando JavaScript...');
+        
+        // Teste inicial de LocalStorage
+        try {
+            if (typeof(Storage) !== "undefined") {
+                console.log('LocalStorage disponível');
+                
+                // Verificar se já existem dados
+                var pratosExistentes = localStorage.getItem('justdelivery_pratos');
+                var ticketsExistentes = localStorage.getItem('justdelivery_tickets');
+                
+                console.log('Dados de pratos no storage: ' + (pratosExistentes ? pratosExistentes.length + ' chars' : 'vazio'));
+                console.log('Dados de tickets no storage: ' + (ticketsExistentes ? ticketsExistentes.length + ' chars' : 'vazio'));
+            } else {
+                console.log('LocalStorage NÃO disponível!');
+            }
+        } catch (e) {
+            console.log('ERRO ao testar localStorage: ' + e.message);
+        }
+    </script>
+    
+    <!-- Script principal -->
+    <script src="script-android-v2.js"></script>
+    
+    <script>
+        // Verificar se tudo carregou
+        setTimeout(function() {
+            if (typeof initApp === 'function') {
+                console.log('Script carregado com sucesso');
+            } else {
+                console.log('ERRO: Script não carregou');
+                document.getElementById('debug').innerHTML += '<br><strong style="color: red;">ERRO: JavaScript não carregou corretamente</strong>';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

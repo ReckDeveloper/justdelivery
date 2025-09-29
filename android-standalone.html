@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>JustDelivery - Android Standalone</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #667eea;
+            color: #333;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #4a5568;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4a5568;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            -webkit-appearance: none;
+        }
+        
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            -webkit-appearance: none;
+        }
+        
+        button:active {
+            opacity: 0.8;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-row button {
+            width: auto;
+            margin-top: 0;
+            padding: 15px;
+        }
+        
+        .debug {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .emergency {
+            background: rgba(255,0,0,0.1);
+            border: 2px solid #e53e3e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .emergency h3 {
+            color: #e53e3e;
+            margin: 0 0 10px 0;
+        }
+        
+        .emergency button {
+            background: #e53e3e;
+            margin: 5px;
+            width: auto;
+            padding: 10px 15px;
+        }
+        
+        .prato-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: white;
+        }
+        
+        .prato-item button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+        }
+        
+        .ticket-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .ticket-header h3 {
+            color: #4a5568;
+            margin: 0;
+        }
+        
+        .ticket-header button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-row button {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚚 JustDelivery</h1>
+            <p>Sistema de Controle de Entregas - Android Standalone</p>
+        </header>
+        
+        <div id="debug" class="debug">
+            Sistema carregando...
+        </div>
+        
+        <div class="emergency">
+            <h3>🚨 Controles de Debug</h3>
+            <button onclick="testeCompleto()">Teste Completo</button>
+            <button onclick="forcarDados()">Forçar Dados</button>
+            <button onclick="limparTudo()">Limpar Tudo</button>
+            <button onclick="mostrarInfo()">Info Sistema</button>
+        </div>
+        
+        <!-- Seção de Pratos do Dia -->
+        <div class="section">
+            <h2>Pratos do Dia</h2>
+            
+            <form id="pratoForm" onsubmit="adicionarPrato(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nomePrato">Nome do Prato:</label>
+                        <input type="text" id="nomePrato" placeholder="Ex: Arroz, feijão e frango" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="precoPrato">Preço (R$):</label>
+                        <input type="number" id="precoPrato" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <button type="submit">+ Adicionar</button>
+                </div>
+            </form>
+            
+            <div id="pratosList">
+                <p style="text-align: center; color: #666; padding: 20px;">Carregando pratos...</p>
+            </div>
+        </div>
+        
+        <!-- Seção de Novo Ticket -->
+        <div class="section">
+            <h2>Novo Ticket de Entrega</h2>
+            
+            <form id="deliveryForm" onsubmit="criarTicket(event)">
+                <div class="form-group">
+                    <label for="pratoPrincipal">Prato Principal:</label>
+                    <select id="pratoPrincipal" required onchange="atualizarValor()">
+                        <option value="">Carregando pratos...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="valorPrato">Valor do Prato:</label>
+                    <input type="text" id="valorPrato" readonly style="background: #f7fafc;">
+                </div>
+                
+                <div class="form-group">
+                    <label>Itens Adicionais:</label>
+                    <div style="padding: 10px 0;">
+                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="refrigerante" value="refrigerante" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
+                            Refrigerante (+R$ 5,00)
+                        </label>
+                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <input type="checkbox" id="sobremesa" value="sobremesa" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
+                            Sobremesa (+R$ 8,00)
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input type="checkbox" id="batata" value="batata" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
+                            Batata Frita (+R$ 6,00)
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="entregador">Entregador:</label>
+                    <select id="entregador" required>
+                        <option value="">Selecione um entregador</option>
+                        <option value="João Silva">João Silva</option>
+                        <option value="Maria Santos">Maria Santos</option>
+                        <option value="Pedro Costa">Pedro Costa</option>
+                        <option value="Ana Oliveira">Ana Oliveira</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dataEntrega">Data da Entrega:</label>
+                    <input type="date" id="dataEntrega" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="horaEntrega">Hora Prevista da Entrega:</label>
+                    <input type="time" id="horaEntrega" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="enderecoEntrega">Endereço de Entrega:</label>
+                    <textarea id="enderecoEntrega" rows="3" placeholder="Endereço completo..." required></textarea>
+                </div>
+                
+                <button type="submit">Criar Ticket de Entrega</button>
+            </form>
+        </div>
+        
+        <!-- Seção de Tickets -->
+        <div class="section">
+            <h2>Tickets de Entrega</h2>
+            <div id="ticketsList">
+                <p style="text-align: center; color: #666; padding: 20px;">Carregando tickets...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        var APP_PRATOS = [];
+        var APP_TICKETS = [];
+        
+        var ADICIONAIS = {
+            refrigerante: { nome: 'Refrigerante', preco: 5.00 },
+            sobremesa: { nome: 'Sobremesa', preco: 8.00 },
+            batata: { nome: 'Batata Frita', preco: 6.00 }
+        };
+
+        // Sistema de log
+        function log(msg) {
+            console.log('[JUSTDELIVERY] ' + msg);
+            var debugDiv = document.getElementById('debug');
+            if (debugDiv) {
+                var now = new Date().toLocaleTimeString();
+                debugDiv.innerHTML += now + ': ' + msg + '<br>';
+                debugDiv.scrollTop = debugDiv.scrollHeight;
+            }
+        }
+
+        // Testar localStorage
+        function testarStorage() {
+            try {
+                localStorage.setItem('teste', 'ok');
+                var resultado = localStorage.getItem('teste');
+                localStorage.removeItem('teste');
+                return resultado === 'ok';
+            } catch (e) {
+                log('ERRO localStorage: ' + e.message);
+                return false;
+            }
+        }
+
+        // Salvar dados
+        function salvarDados() {
+            try {
+                if (testarStorage()) {
+                    localStorage.setItem('app_pratos', JSON.stringify(APP_PRATOS));
+                    localStorage.setItem('app_tickets', JSON.stringify(APP_TICKETS));
+                    log('Dados salvos: ' + APP_PRATOS.length + ' pratos, ' + APP_TICKETS.length + ' tickets');
+                } else {
+                    log('AVISO: localStorage indisponível');
+                }
+            } catch (e) {
+                log('ERRO ao salvar: ' + e.message);
+            }
+        }
+
+        // Carregar dados
+        function carregarDados() {
+            try {
+                if (testarStorage()) {
+                    var pratos = localStorage.getItem('app_pratos');
+                    var tickets = localStorage.getItem('app_tickets');
+                    
+                    if (pratos) {
+                        APP_PRATOS = JSON.parse(pratos);
+                        log('Pratos carregados: ' + APP_PRATOS.length);
+                    }
+                    
+                    if (tickets) {
+                        APP_TICKETS = JSON.parse(tickets);
+                        log('Tickets carregados: ' + APP_TICKETS.length);
+                    }
+                }
+            } catch (e) {
+                log('ERRO ao carregar: ' + e.message);
+                APP_PRATOS = [];
+                APP_TICKETS = [];
+            }
+        }
+
+        // Dados exemplo
+        function carregarExemplo() {
+            log('Carregando dados exemplo...');
+            
+            APP_PRATOS = [
+                { id: 1, nome: 'Arroz, feijão e frango grelhado', preco: 18.50 },
+                { id: 2, nome: 'Lasanha à bolonhesa', preco: 22.00 },
+                { id: 3, nome: 'Hambúrguer artesanal', preco: 25.00 },
+                { id: 4, nome: 'Pizza margherita', preco: 28.00 },
+                { id: 5, nome: 'Salada caesar', preco: 16.00 }
+            ];
+            
+            APP_TICKETS = [];
+            
+            salvarDados();
+            log('Dados exemplo carregados!');
+        }
+
+        // Renderizar pratos
+        function renderizarPratos() {
+            log('Renderizando ' + APP_PRATOS.length + ' pratos...');
+            
+            var container = document.getElementById('pratosList');
+            if (!container) {
+                log('ERRO: Container pratosList não encontrado');
+                return;
+            }
+
+            if (APP_PRATOS.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhum prato cadastrado</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < APP_PRATOS.length; i++) {
+                html += '<div class="prato-item">';
+                html += '<span><strong>' + APP_PRATOS[i].nome + '</strong><br>R$ ' + APP_PRATOS[i].preco.toFixed(2) + '</span>';
+                html += '<button onclick="removerPrato(' + i + ')">Remover</button>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+            log('Pratos renderizados!');
+        }
+
+        // Atualizar select
+        function atualizarSelect() {
+            log('Atualizando select com ' + APP_PRATOS.length + ' pratos...');
+            
+            var select = document.getElementById('pratoPrincipal');
+            if (!select) {
+                log('ERRO: Select não encontrado');
+                return;
+            }
+
+            var html = '<option value="">Selecione um prato</option>';
+            for (var i = 0; i < APP_PRATOS.length; i++) {
+                html += '<option value="' + i + '">' + APP_PRATOS[i].nome + ' - R$ ' + APP_PRATOS[i].preco.toFixed(2) + '</option>';
+            }
+            
+            select.innerHTML = html;
+            log('Select atualizado!');
+        }
+
+        // Adicionar prato
+        function adicionarPrato(event) {
+            event.preventDefault();
+            log('Adicionando novo prato...');
+            
+            var nome = document.getElementById('nomePrato').value.trim();
+            var preco = parseFloat(document.getElementById('precoPrato').value);
+            
+            if (!nome || isNaN(preco) || preco <= 0) {
+                alert('Preencha nome e preço válidos!');
+                return;
+            }
+            
+            APP_PRATOS.push({
+                id: Date.now(),
+                nome: nome,
+                preco: preco
+            });
+            
+            document.getElementById('nomePrato').value = '';
+            document.getElementById('precoPrato').value = '';
+            
+            salvarDados();
+            renderizarPratos();
+            atualizarSelect();
+            
+            log('Prato adicionado: ' + nome);
+        }
+
+        // Remover prato
+        function removerPrato(index) {
+            if (index >= 0 && index < APP_PRATOS.length) {
+                var nome = APP_PRATOS[index].nome;
+                APP_PRATOS.splice(index, 1);
+                salvarDados();
+                renderizarPratos();
+                atualizarSelect();
+                log('Prato removido: ' + nome);
+            }
+        }
+
+        // Atualizar valor
+        function atualizarValor() {
+            var select = document.getElementById('pratoPrincipal');
+            var valorInput = document.getElementById('valorPrato');
+            
+            if (!select || !valorInput) return;
+            
+            var index = parseInt(select.value);
+            var total = 0;
+            
+            if (!isNaN(index) && APP_PRATOS[index]) {
+                total = APP_PRATOS[index].preco;
+            }
+            
+            // Adicionar itens extras
+            if (document.getElementById('refrigerante').checked) total += 5.00;
+            if (document.getElementById('sobremesa').checked) total += 8.00;
+            if (document.getElementById('batata').checked) total += 6.00;
+            
+            valorInput.value = total > 0 ? 'R$ ' + total.toFixed(2) : '';
+        }
+
+        // Criar ticket
+        function criarTicket(event) {
+            event.preventDefault();
+            log('Criando novo ticket...');
+            
+            var pratoIndex = parseInt(document.getElementById('pratoPrincipal').value);
+            var entregador = document.getElementById('entregador').value;
+            var data = document.getElementById('dataEntrega').value;
+            var hora = document.getElementById('horaEntrega').value;
+            var endereco = document.getElementById('enderecoEntrega').value.trim();
+            
+            if (isNaN(pratoIndex) || !APP_PRATOS[pratoIndex]) {
+                alert('Selecione um prato válido!');
+                return;
+            }
+            
+            if (!entregador || !data || !hora || !endereco) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            
+            var adicionais = [];
+            if (document.getElementById('refrigerante').checked) {
+                adicionais.push(ADICIONAIS.refrigerante);
+            }
+            if (document.getElementById('sobremesa').checked) {
+                adicionais.push(ADICIONAIS.sobremesa);
+            }
+            if (document.getElementById('batata').checked) {
+                adicionais.push(ADICIONAIS.batata);
+            }
+            
+            var valorTotal = APP_PRATOS[pratoIndex].preco;
+            for (var i = 0; i < adicionais.length; i++) {
+                valorTotal += adicionais[i].preco;
+            }
+            
+            var ticket = {
+                id: Date.now(),
+                prato: APP_PRATOS[pratoIndex],
+                adicionais: adicionais,
+                valorTotal: valorTotal,
+                entregador: entregador,
+                data: data,
+                hora: hora,
+                endereco: endereco,
+                status: 'Pendente',
+                criacao: new Date().toLocaleString()
+            };
+            
+            APP_TICKETS.push(ticket);
+            salvarDados();
+            renderizarTickets();
+            
+            // Limpar formulário
+            document.getElementById('deliveryForm').reset();
+            document.getElementById('valorPrato').value = '';
+            definirDataHoje();
+            
+            log('Ticket criado: #' + ticket.id);
+            alert('Ticket criado com sucesso!');
+        }
+
+        // Renderizar tickets
+        function renderizarTickets() {
+            log('Renderizando ' + APP_TICKETS.length + ' tickets...');
+            
+            var container = document.getElementById('ticketsList');
+            if (!container) {
+                log('ERRO: Container ticketsList não encontrado');
+                return;
+            }
+
+            if (APP_TICKETS.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhum ticket criado</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = APP_TICKETS.length - 1; i >= 0; i--) {
+                var ticket = APP_TICKETS[i];
+                html += '<div class="ticket-item">';
+                html += '<div class="ticket-header">';
+                html += '<h3>Ticket #' + ticket.id + '</h3>';
+                html += '<button onclick="removerTicket(' + i + ')">Remover</button>';
+                html += '</div>';
+                html += '<p><strong>Prato:</strong> ' + ticket.prato.nome + ' - R$ ' + ticket.prato.preco.toFixed(2) + '</p>';
+                
+                if (ticket.adicionais.length > 0) {
+                    html += '<p><strong>Adicionais:</strong><br>';
+                    for (var j = 0; j < ticket.adicionais.length; j++) {
+                        html += '• ' + ticket.adicionais[j].nome + ' - R$ ' + ticket.adicionais[j].preco.toFixed(2) + '<br>';
+                    }
+                    html += '</p>';
+                }
+                
+                html += '<p><strong>Total:</strong> R$ ' + ticket.valorTotal.toFixed(2) + '</p>';
+                html += '<p><strong>Entregador:</strong> ' + ticket.entregador + '</p>';
+                html += '<p><strong>Data/Hora Prevista:</strong> ' + ticket.data + ' às ' + ticket.hora + '</p>';
+                html += '<p><strong>Endereço:</strong> ' + ticket.endereco + '</p>';
+                html += '<p><strong>Status:</strong> <span style="color: #d69e2e;">' + ticket.status + '</span></p>';
+                html += '<p style="color: #666; font-size: 12px; margin-top: 10px;">Criado: ' + ticket.criacao + '</p>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+            log('Tickets renderizados!');
+        }
+
+        // Remover ticket
+        function removerTicket(index) {
+            if (index >= 0 && index < APP_TICKETS.length) {
+                var id = APP_TICKETS[index].id;
+                APP_TICKETS.splice(index, 1);
+                salvarDados();
+                renderizarTickets();
+                log('Ticket removido: #' + id);
+            }
+        }
+
+        // Definir data de hoje
+        function definirDataHoje() {
+            var hoje = new Date();
+            var ano = hoje.getFullYear();
+            var mes = ('0' + (hoje.getMonth() + 1)).slice(-2);
+            var dia = ('0' + hoje.getDate()).slice(-2);
+            
+            var dataInput = document.getElementById('dataEntrega');
+            if (dataInput) {
+                dataInput.value = ano + '-' + mes + '-' + dia;
+            }
+        }
+
+        // === FUNÇÕES DE DEBUG ===
+        function testeCompleto() {
+            log('=== TESTE COMPLETO INICIADO ===');
+            
+            log('1. Testando localStorage...');
+            log('LocalStorage OK: ' + testarStorage());
+            
+            log('2. Forçando dados exemplo...');
+            carregarExemplo();
+            
+            log('3. Renderizando interface...');
+            renderizarPratos();
+            atualizarSelect();
+            renderizarTickets();
+            
+            log('4. Definindo data atual...');
+            definirDataHoje();
+            
+            log('=== TESTE CONCLUÍDO ===');
+            alert('Teste completo realizado! Verifique os logs.');
+        }
+
+        function forcarDados() {
+            log('Forçando carregamento de dados...');
+            carregarExemplo();
+            renderizarPratos();
+            atualizarSelect();
+            renderizarTickets();
+            alert('Dados forçados!');
+        }
+
+        function limparTudo() {
+            log('Limpando todos os dados...');
+            APP_PRATOS = [];
+            APP_TICKETS = [];
+            if (testarStorage()) {
+                localStorage.removeItem('app_pratos');
+                localStorage.removeItem('app_tickets');
+            }
+            renderizarPratos();
+            atualizarSelect();
+            renderizarTickets();
+            alert('Dados limpos!');
+        }
+
+        function mostrarInfo() {
+            var info = 'INFORMAÇÕES DO SISTEMA:\n\n';
+            info += 'User Agent: ' + navigator.userAgent + '\n\n';
+            info += 'Dados em memória:\n';
+            info += '• Pratos: ' + APP_PRATOS.length + '\n';
+            info += '• Tickets: ' + APP_TICKETS.length + '\n\n';
+            info += 'LocalStorage:\n';
+            info += '• Disponível: ' + testarStorage() + '\n';
+            
+            if (testarStorage()) {
+                var pratos = localStorage.getItem('app_pratos');
+                var tickets = localStorage.getItem('app_tickets');
+                info += '• Pratos salvos: ' + (pratos ? JSON.parse(pratos).length : 0) + '\n';
+                info += '• Tickets salvos: ' + (tickets ? JSON.parse(tickets).length : 0) + '\n';
+            }
+            
+            info += '\nElementos DOM:\n';
+            info += '• pratosList: ' + (document.getElementById('pratosList') ? 'OK' : 'ERRO') + '\n';
+            info += '• pratoPrincipal: ' + (document.getElementById('pratoPrincipal') ? 'OK' : 'ERRO') + '\n';
+            info += '• ticketsList: ' + (document.getElementById('ticketsList') ? 'OK' : 'ERRO') + '\n';
+            
+            alert(info);
+            log('Info do sistema mostrada');
+        }
+
+        // === INICIALIZAÇÃO ===
+        function inicializar() {
+            log('=== INICIANDO JUSTDELIVERY ANDROID ===');
+            
+            try {
+                log('1. Carregando dados salvos...');
+                carregarDados();
+                
+                log('2. Verificando se precisa de dados exemplo...');
+                if (APP_PRATOS.length === 0) {
+                    log('Nenhum prato encontrado, carregando exemplo...');
+                    carregarExemplo();
+                }
+                
+                log('3. Renderizando interface...');
+                renderizarPratos();
+                atualizarSelect();
+                renderizarTickets();
+                
+                log('4. Definindo data atual...');
+                definirDataHoje();
+                
+                log('=== SISTEMA INICIADO COM SUCESSO ===');
+                log('Pratos disponíveis: ' + APP_PRATOS.length);
+                log('Tickets existentes: ' + APP_TICKETS.length);
+                
+                // Ocultar debug após 5 segundos
+                setTimeout(function() {
+                    var debugDiv = document.getElementById('debug');
+                    if (debugDiv) {
+                        debugDiv.style.display = 'none';
+                    }
+                }, 5000);
+                
+            } catch (erro) {
+                log('ERRO CRÍTICO: ' + erro.message);
+                alert('Erro ao inicializar: ' + erro.message);
+            }
+        }
+
+        // Aguardar página carregar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inicializar);
+        } else {
+            setTimeout(inicializar, 100);
+        }
+        
+        // Expor funções globalmente
+        window.adicionarPrato = adicionarPrato;
+        window.removerPrato = removerPrato;
+        window.criarTicket = criarTicket;
+        window.removerTicket = removerTicket;
+        window.atualizarValor = atualizarValor;
+        window.testeCompleto = testeCompleto;
+        window.forcarDados = forcarDados;
+        window.limparTudo = limparTudo;
+        window.mostrarInfo = mostrarInfo;
+    </script>
+</body>
+</html>

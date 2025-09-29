@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste JustDelivery - Android</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #667eea;
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .test-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+        
+        button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        
+        button:active {
+            opacity: 0.8;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        
+        .result {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Teste de Compatibilidade Android</h1>
+    
+    <div class="test-section">
+        <h2>1. Teste de JavaScript Básico</h2>
+        <button onclick="testarJS()">Testar JavaScript</button>
+        <div id="jsResult" class="result">Aguardando teste...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Teste de LocalStorage</h2>
+        <button onclick="testarLocalStorage()">Testar LocalStorage</button>
+        <div id="storageResult" class="result">Aguardando teste...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Teste de Formulário</h2>
+        <form id="testForm">
+            <input type="text" id="testInput" placeholder="Digite algo aqui" required>
+            <select id="testSelect">
+                <option value="">Selecione uma opção</option>
+                <option value="opcao1">Opção 1</option>
+                <option value="opcao2">Opção 2</option>
+            </select>
+            <button type="submit">Enviar Formulário</button>
+        </form>
+        <div id="formResult" class="result">Aguardando envio...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Informações do Dispositivo</h2>
+        <div id="deviceInfo" class="result">Carregando...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Teste do Sistema Principal</h2>
+        <button onclick="window.location.href='index.html'">Ir para JustDelivery</button>
+    </div>
+
+    <script>
+        // Função para testar JavaScript básico
+        function testarJS() {
+            try {
+                var resultado = '';
+                
+                // Teste de variáveis
+                var teste1 = 'JavaScript funcionando';
+                resultado += 'Variáveis: OK\\n';
+                
+                // Teste de arrays
+                var array = [1, 2, 3];
+                var filtrado = [];
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i] > 1) {
+                        filtrado.push(array[i]);
+                    }
+                }
+                resultado += 'Arrays: OK (' + filtrado.length + ' itens)\\n';
+                
+                // Teste de objetos
+                var obj = { nome: 'teste', valor: 123 };
+                resultado += 'Objetos: OK (' + obj.nome + ')\\n';
+                
+                // Teste de Date
+                var agora = new Date();
+                resultado += 'Date: OK (' + agora.getFullYear() + ')\\n';
+                
+                document.getElementById('jsResult').innerHTML = resultado;
+                
+            } catch (error) {
+                document.getElementById('jsResult').innerHTML = 'ERRO: ' + error.message;
+            }
+        }
+        
+        // Função para testar LocalStorage
+        function testarLocalStorage() {
+            try {
+                var resultado = '';
+                
+                // Testar se localStorage existe
+                if (typeof(Storage) !== "undefined") {
+                    resultado += 'LocalStorage: Disponível\\n';
+                    
+                    // Testar escrita
+                    localStorage.setItem('teste', 'valor_teste');
+                    resultado += 'Escrita: OK\\n';
+                    
+                    // Testar leitura
+                    var valor = localStorage.getItem('teste');
+                    if (valor === 'valor_teste') {
+                        resultado += 'Leitura: OK\\n';
+                    } else {
+                        resultado += 'Leitura: ERRO\\n';
+                    }
+                    
+                    // Testar JSON
+                    var obj = { teste: 'json', numero: 123 };
+                    localStorage.setItem('teste_json', JSON.stringify(obj));
+                    var objRecuperado = JSON.parse(localStorage.getItem('teste_json'));
+                    if (objRecuperado.teste === 'json') {
+                        resultado += 'JSON: OK\\n';
+                    } else {
+                        resultado += 'JSON: ERRO\\n';
+                    }
+                    
+                    // Limpeza
+                    localStorage.removeItem('teste');
+                    localStorage.removeItem('teste_json');
+                    
+                } else {
+                    resultado += 'LocalStorage: NÃO DISPONÍVEL\\n';
+                }
+                
+                document.getElementById('storageResult').innerHTML = resultado;
+                
+            } catch (error) {
+                document.getElementById('storageResult').innerHTML = 'ERRO: ' + error.message;
+            }
+        }
+        
+        // Mostrar informações do dispositivo
+        function mostrarInfoDispositivo() {
+            try {
+                var info = '';
+                info += 'User Agent: ' + navigator.userAgent + '\\n\\n';
+                info += 'Largura da tela: ' + window.innerWidth + 'px\\n';
+                info += 'Altura da tela: ' + window.innerHeight + 'px\\n';
+                info += 'Pixel Ratio: ' + (window.devicePixelRatio || 1) + '\\n';
+                info += 'Touch Support: ' + ('ontouchstart' in window ? 'SIM' : 'NÃO') + '\\n';
+                info += 'LocalStorage: ' + (typeof(Storage) !== "undefined" ? 'SIM' : 'NÃO') + '\\n';
+                info += 'JSON: ' + (typeof JSON !== "undefined" ? 'SIM' : 'NÃO') + '\\n';
+                
+                // Verificar se é Android
+                var isAndroid = /Android/i.test(navigator.userAgent);
+                info += 'É Android: ' + (isAndroid ? 'SIM' : 'NÃO') + '\\n';
+                
+                if (isAndroid) {
+                    var match = navigator.userAgent.match(/Android ([0-9.]+)/i);
+                    if (match) {
+                        info += 'Versão Android: ' + match[1] + '\\n';
+                    }
+                }
+                
+                document.getElementById('deviceInfo').innerHTML = info;
+                
+            } catch (error) {
+                document.getElementById('deviceInfo').innerHTML = 'ERRO: ' + error.message;
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            mostrarInfoDispositivo();
+            
+            // Teste de formulário
+            document.getElementById('testForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                var input = document.getElementById('testInput').value;
+                var select = document.getElementById('testSelect').value;
+                
+                var resultado = 'Formulário enviado!\\n';
+                resultado += 'Input: ' + input + '\\n';
+                resultado += 'Select: ' + select + '\\n';
+                
+                document.getElementById('formResult').innerHTML = resultado;
+            });
+        });
+        
+        // Executar teste básico automaticamente
+        setTimeout(function() {
+            testarJS();
+            testarLocalStorage();
+        }, 1000);
+    </script>
+</body>
+</html>

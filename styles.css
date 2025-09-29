@@ -1,0 +1,1115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Helvetica Neue', Arial, sans-serif;
+    background: #667eea;
+    background: -webkit-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -moz-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: -o-linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    position: relative;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    color: #4a5568;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #718096;
+    font-size: 1.2em;
+}
+
+/* Layout base com fallbacks */
+main {
+    display: block;
+    width: 100%;
+}
+
+.desktop-grid {
+    display: block;
+    width: 100%;
+}
+
+/* Para navegadores que suportam flexbox */
+@supports (display: flex) {
+    main {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        gap: 30px;
+        -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+        align-items: stretch;
+    }
+
+    .desktop-grid {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        gap: 30px;
+        -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+        align-items: stretch;
+    }
+}
+
+/* Layout desktop para navegadores modernos */
+@media (min-width: 1025px) {
+    @supports (display: flex) {
+        .desktop-grid {
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: row;
+            flex-direction: row;
+            -webkit-box-align: start;
+            -ms-flex-align: start;
+            align-items: flex-start;
+        }
+        
+        .form-section,
+        .tickets-section {
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
+            flex: 1;
+        }
+    }
+}
+
+/* Responsividade para tablets */
+@media (max-width: 1024px) {
+    main {
+        gap: 25px;
+    }
+    
+    .desktop-grid {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+    
+    .container {
+        padding: 15px;
+    }
+    
+    header {
+        padding: 25px 20px;
+    }
+    
+    header h1 {
+        font-size: 2.2em;
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        padding: 25px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .form-row .form-group {
+        flex: 1 1 auto;
+        min-width: auto;
+    }
+    
+    .form-row .btn-add-prato {
+        margin-top: 10px;
+    }
+}
+
+.pratos-section {
+    grid-column: 1 / -1;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0;
+    width: 100%;
+    order: -1;
+}
+
+.form-section, .tickets-section {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2, .tickets-section h2, .pratos-section h2 {
+    color: #4a5568;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    border-bottom: 3px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.adicional-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #f7fafc;
+    border-radius: 6px;
+}
+
+.adicional-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Estilos para Cadastro de Pratos */
+.pratos-cadastro {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.form-row .form-group {
+    flex: 2;
+    min-width: 200px;
+}
+
+.form-row .form-group:nth-child(2) {
+    flex: 1;
+    min-width: 120px;
+}
+
+.form-row .btn-add-prato {
+    flex: 0 0 auto;
+}
+
+.btn-add-prato {
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    height: fit-content;
+}
+
+.btn-add-prato:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
+}
+
+.pratos-list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.prato-card {
+    flex: 1 1 250px;
+    min-width: 250px;
+    max-width: 300px;
+}
+
+.prato-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.prato-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.prato-nome {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1em;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.prato-preco {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #38a169;
+    margin-bottom: 10px;
+}
+
+.prato-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-remove-prato {
+    padding: 6px 12px;
+    background: #fed7d7;
+    color: #c53030;
+    border: 2px solid #c53030;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-remove-prato:hover {
+    background: #c53030;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.prato-disponivel {
+    border-left: 4px solid #38a169;
+}
+
+.prato-indisponivel {
+    border-left: 4px solid #e53e3e;
+    opacity: 0.6;
+}
+
+.empty-pratos {
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+    font-style: italic;
+    grid-column: 1 / -1;
+}
+
+.filter-section {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filter-section select,
+.filter-section input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.tickets-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.ticket-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.ticket-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.ticket-id {
+    font-weight: 700;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pendente {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+.status-em-transito {
+    background: #fef5e7;
+    color: #dd6b20;
+}
+
+.status-entregue {
+    background: #c6f6d5;
+    color: #38a169;
+}
+
+.ticket-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: #718096;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 14px;
+    color: #2d3748;
+    font-weight: 500;
+}
+
+.valor-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #38a169;
+}
+
+.itens-adicionais {
+    margin-top: 10px;
+}
+
+.item-adicional {
+    display: inline-block;
+    background: #e2e8f0;
+    color: #4a5568;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin-right: 8px;
+    margin-bottom: 5px;
+}
+
+.ticket-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-transito {
+    background: #fef5e7;
+    color: #dd6b20;
+    border: 2px solid #dd6b20;
+}
+
+.btn-entregar {
+    background: #c6f6d5;
+    color: #38a169;
+    border: 2px solid #38a169;
+}
+
+.btn-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #718096;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 10px;
+        max-width: 100%;
+    }
+    
+    main {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    header {
+        padding: 20px 15px;
+        margin-bottom: 20px;
+    }
+    
+    header h1 {
+        font-size: 1.8em;
+        margin-bottom: 8px;
+    }
+    
+    header p {
+        font-size: 1em;
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        padding: 20px 15px;
+        border-radius: 12px;
+    }
+    
+    .form-section h2, .tickets-section h2, .pratos-section h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .btn-add-prato {
+        width: 100%;
+        padding: 15px;
+        font-size: 16px;
+    }
+    
+    .pratos-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .prato-card {
+        padding: 12px;
+    }
+    
+    .prato-nome {
+        font-size: 0.95em;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    .form-group label {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 15px 12px;
+        font-size: 16px; /* Evita zoom no iOS */
+        border-radius: 8px;
+    }
+    
+    .btn-submit {
+        padding: 18px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+    
+    .ticket-details {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .ticket-card {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+    
+    .ticket-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .ticket-id {
+        font-size: 1em;
+    }
+    
+    .status-badge {
+        font-size: 11px;
+        padding: 5px 10px;
+    }
+    
+    .detail-label {
+        font-size: 11px;
+    }
+    
+    .detail-value {
+        font-size: 13px;
+    }
+    
+    .valor-total {
+        font-size: 16px;
+    }
+    
+    .filter-section {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .filter-section select,
+    .filter-section input {
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+    
+    .ticket-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-action {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+        text-align: center;
+    }
+    
+    .tickets-list {
+        max-height: 500px;
+    }
+    
+    .adicional-group {
+        padding: 10px;
+        margin-bottom: 6px;
+    }
+    
+    .adicional-group label {
+        font-size: 14px;
+    }
+}
+
+/* Responsividade para dispositivos muito pequenos */
+@media (max-width: 480px) {
+    .container {
+        padding: 8px;
+    }
+    
+    header {
+        padding: 15px 10px;
+    }
+    
+    header h1 {
+        font-size: 1.6em;
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        padding: 15px 12px;
+    }
+    
+    .form-section h2, .tickets-section h2, .pratos-section h2 {
+        font-size: 1.3em;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px 10px;
+    }
+    
+    .ticket-card {
+        padding: 12px;
+    }
+    
+    .prato-card {
+        padding: 10px;
+    }
+    
+    .prato-nome {
+        font-size: 0.9em;
+        line-height: 1.2;
+    }
+    
+    .prato-preco {
+        font-size: 1.1em;
+    }
+    
+    .btn-remove-prato {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+    
+    .item-adicional {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+    
+    .detail-value {
+        font-size: 12px;
+    }
+    
+    .valor-total {
+        font-size: 15px;
+    }
+}
+
+/* Responsividade para telas muito grandes */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1400px;
+    }
+    
+    main {
+        gap: 40px;
+    }
+    
+    .pratos-list {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        padding: 35px;
+    }
+}
+
+/* Otimizações para landscape em dispositivos móveis */
+@media (max-width: 768px) and (orientation: landscape) {
+    header {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.7em;
+        margin-bottom: 5px;
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        padding: 18px 15px;
+    }
+    
+    .tickets-list {
+        max-height: 350px;
+    }
+    
+    .form-row {
+        grid-template-columns: 2fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+    }
+    
+    .btn-add-prato {
+        width: auto;
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+/* Animações */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ticket-card {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Melhorias para dispositivos touch */
+@media (hover: none) and (pointer: coarse) {
+    .btn-submit,
+    .btn-add-prato,
+    .btn-action,
+    .btn-remove-prato {
+        min-height: 44px; /* Apple Human Interface Guidelines */
+        min-width: 44px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        min-height: 44px;
+    }
+    
+    .ticket-card:hover {
+        transform: none; /* Remove hover effects em touch devices */
+    }
+    
+    .prato-card:hover {
+        transform: none;
+    }
+    
+    .btn-submit:hover,
+    .btn-add-prato:hover,
+    .btn-action:hover,
+    .btn-remove-prato:hover {
+        transform: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Melhorias para acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .ticket-card {
+        animation: none;
+    }
+}
+
+/* Alto contraste */
+@media (prefers-contrast: high) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        border: 3px solid #000;
+    }
+    
+    .btn-submit,
+    .btn-add-prato {
+        border: 2px solid #000;
+    }
+    
+    .status-badge {
+        border: 2px solid #000;
+        font-weight: 700;
+    }
+}
+
+/* Modo escuro (se suportado pelo sistema) */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        color: #e2e8f0;
+    }
+    
+    .form-section, .tickets-section, .pratos-section {
+        background: rgba(45, 55, 72, 0.95);
+        color: #e2e8f0;
+    }
+    
+    header {
+        background: rgba(45, 55, 72, 0.95);
+        color: #e2e8f0;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    .ticket-card {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+    
+    .prato-card {
+        background: #4a5568;
+        border-color: #718096;
+        color: #e2e8f0;
+    }
+}
+
+/* Estilos específicos para dispositivos móveis */
+.mobile-device .form-group input,
+.mobile-device .form-group select,
+.mobile-device .form-group textarea {
+    padding: 16px 14px;
+    font-size: 16px !important; /* Previne zoom no iOS */
+    border-radius: 10px;
+}
+
+.mobile-device .btn-submit,
+.mobile-device .btn-add-prato {
+    padding: 18px;
+    font-size: 16px;
+    border-radius: 12px;
+    min-height: 50px;
+}
+
+.mobile-device .ticket-card {
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.mobile-device .prato-card {
+    border-radius: 12px;
+}
+
+/* Estilos específicos para Android */
+.android-device {
+    --vh: 1vh; /* Fallback */
+}
+
+.android-device body {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+}
+
+.android-device .form-group input,
+.android-device .form-group select,
+.android-device .form-group textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px !important;
+    line-height: 1.5;
+    padding: 14px 16px;
+    transition: border-color 0.3s ease;
+}
+
+.android-device .form-group select {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23666' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 40px;
+}
+
+.android-device .btn-submit,
+.android-device .btn-add-prato,
+.android-device .btn-action,
+.android-device .btn-remove-prato {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 16px 20px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.android-device .pratos-list {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.android-device .prato-card {
+    flex: 1 1 auto;
+    min-width: auto;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* Estilos para dispositivos touch */
+.touch-device button,
+.touch-device .btn-submit,
+.touch-device .btn-add-prato,
+.touch-device .btn-action,
+.touch-device .btn-remove-prato {
+    transition: opacity 0.1s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+.touch-device .ticket-card,
+.touch-device .prato-card {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Estilos para telas de alta densidade */
+.high-dpi .ticket-card,
+.high-dpi .prato-card {
+    border-width: 1px;
+}
+
+.high-dpi .status-badge {
+    border-radius: 16px;
+}
+
+/* Melhorias para scroll suave */
+.tickets-list,
+.pratos-list {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Otimizações para performance */
+.ticket-card,
+.prato-card {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Estados de carregamento */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Melhorias para formulários em dispositivos móveis */
+@media (max-width: 768px) {
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        transform: scale(1.02);
+        transition: transform 0.2s ease;
+    }
+    
+    .form-group input[type="checkbox"] {
+        transform: scale(1.3);
+    }
+    
+    .adicional-group {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .adicional-group input[type="checkbox"] {
+        margin-right: 12px;
+        min-width: 20px;
+        min-height: 20px;
+    }
+}
