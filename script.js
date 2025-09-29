@@ -619,6 +619,47 @@ function updatePratoSelect() {
 }
 
 /**
+ * Atualiza os itens adicionais no formulário de tickets
+ */
+function updateItensAdicionaisForm() {
+    var container = document.getElementById('itensAdicionaisContainer');
+    
+    if (!container) {
+        console.error('Container itensAdicionaisContainer não encontrado');
+        return;
+    }
+    
+    if (itensAdicionais.length === 0) {
+        container.innerHTML = '<div class="empty-adicionais-form">Nenhum item adicional disponível</div>';
+        return;
+    }
+    
+    // Filtrar apenas itens disponíveis
+    var itensDisponiveis = itensAdicionais.filter(function(item) {
+        return item.disponivel;
+    });
+    
+    if (itensDisponiveis.length === 0) {
+        container.innerHTML = '<div class="empty-adicionais-form">Nenhum item adicional ativo</div>';
+        return;
+    }
+    
+    var html = '';
+    itensDisponiveis
+        .sort(function(a, b) {
+            return a.nome.localeCompare(b.nome);
+        })
+        .forEach(function(item) {
+            html += '<div class="adicional-group">';
+            html += '<input type="checkbox" id="adicional_' + item.id + '" value="' + item.id + '" onchange="updateValorTotal()">';
+            html += '<label for="adicional_' + item.id + '">' + item.nome + ' (+R$ ' + item.preco.toFixed(2) + ')</label>';
+            html += '</div>';
+        });
+    
+    container.innerHTML = html;
+}
+
+/**
  * Processa a seleção de um prato
  */
 function handlePratoSelection(event) {
@@ -629,9 +670,43 @@ function handlePratoSelection(event) {
     if (selectedOption.value) {
         var preco = parseFloat(selectedOption.getAttribute('data-preco'));
         valorPrato.value = 'R$ ' + preco.toFixed(2);
+        updateValorTotal(); // Atualizar valor total incluindo adicionais
     } else {
         valorPrato.value = '';
+        updateValorTotal();
     }
+}
+
+/**
+ * Atualiza o valor total do pedido incluindo itens adicionais
+ */
+function updateValorTotal() {
+    var select = document.getElementById('pratoPrincipal');
+    var valorInput = document.getElementById('valorPrato');
+    
+    if (!select || !valorInput) return;
+    
+    var selectedOption = select.options[select.selectedIndex];
+    var total = 0;
+    
+    // Adicionar valor do prato principal
+    if (selectedOption.value) {
+        total = parseFloat(selectedOption.getAttribute('data-preco')) || 0;
+    }
+    
+    // Adicionar itens adicionais selecionados
+    var checkboxes = document.querySelectorAll('#itensAdicionaisContainer input[type="checkbox"]:checked');
+    checkboxes.forEach(function(checkbox) {
+        var adicionalId = parseInt(checkbox.value);
+        var item = itensAdicionais.find(function(adicional) {
+            return adicional.id === adicionalId;
+        });
+        if (item) {
+            total += item.preco;
+        }
+    });
+    
+    valorInput.value = total > 0 ? 'R$ ' + total.toFixed(2) : '';
 }
 
 /**
