@@ -5,6 +5,9 @@ var pratosDisponiveis = [];
 var pratoIdCounter = 1;
 var itensAdicionais = [];
 var adicionalIdCounter = 1;
+var entregadorIdCounter = 1;
+var entregadoresDisponiveis = [];
+var entregadorIdCounter = 1;
 
 // Preços dos itens adicionais padrão
 var PRECOS_ADICIONAIS_PADRAO = {
@@ -21,8 +24,8 @@ function initializeApp() {
     try {
         // Verificar se todos os elementos necessários existem
         var requiredElements = [
-            'deliveryForm', 'pratoForm', 'adicionalForm', 'pratoPrincipal', 
-            'filtroStatus', 'filtroEntregador', 'pratosList', 'adicionaisList', 'ticketsList'
+            'deliveryForm', 'pratoForm', 'adicionalForm', 'entregadorForm', 'pratoPrincipal', 
+            'filtroStatus', 'filtroEntregador', 'pratosList', 'adicionaisList', 'entregadoresList', 'ticketsList'
         ];
         
         var missingElements = [];
@@ -42,6 +45,7 @@ function initializeApp() {
         loadTicketsFromStorage();
         loadPratosFromStorage();
         loadItensAdicionaisFromStorage();
+        loadEntregadoresFromStorage();
         
         // Configurar data e hora atuais por padrão
         setCurrentDateTime();
@@ -50,6 +54,7 @@ function initializeApp() {
         var deliveryForm = document.getElementById('deliveryForm');
         var pratoForm = document.getElementById('pratoForm');
         var adicionalForm = document.getElementById('adicionalForm');
+        var entregadorForm = document.getElementById('entregadorForm');
         var pratoPrincipal = document.getElementById('pratoPrincipal');
         var filtroStatus = document.getElementById('filtroStatus');
         var filtroEntregador = document.getElementById('filtroEntregador');
@@ -64,6 +69,10 @@ function initializeApp() {
         
         if (adicionalForm) {
             adicionalForm.addEventListener('submit', handleAdicionalSubmit);
+        }
+        
+        if (entregadorForm) {
+            entregadorForm.addEventListener('submit', handleEntregadorSubmit);
         }
         
         if (pratoPrincipal) {
@@ -81,7 +90,13 @@ function initializeApp() {
         // Renderizar dados iniciais
         renderPratos();
         renderItensAdicionais();
+        renderEntregadores();
         renderTickets();
+        
+        // Atualizar selects e formulários
+        updatePratoSelect();
+        updateItensAdicionaisForm();
+        updateEntregadorSelect();
         
         // Carregar pratos padrão se não houver nenhum
         if (pratosDisponiveis.length === 0) {
@@ -91,6 +106,11 @@ function initializeApp() {
         // Carregar itens adicionais padrão se não houver nenhum
         if (itensAdicionais.length === 0) {
             carregarItensAdicionaisPadrao();
+        }
+        
+        // Carregar entregadores padrão se não houver nenhum
+        if (entregadoresDisponiveis.length === 0) {
+            carregarEntregadoresPadrao();
         }
         
         // Melhorias para dispositivos móveis
@@ -317,6 +337,70 @@ function carregarItensAdicionaisPadrao() {
 }
 
 /**
+ * Carrega entregadores padrão do sistema
+ */
+function carregarEntregadoresPadrao() {
+    try {
+        var entregadoresPadrao = [
+            { nome: "João Silva" },
+            { nome: "Maria Santos" },
+            { nome: "Pedro Oliveira" },
+            { nome: "Ana Costa" },
+            { nome: "Carlos Ferreira" }
+        ];
+        
+        for (var i = 0; i < entregadoresPadrao.length; i++) {
+            var entregador = entregadoresPadrao[i];
+            entregadoresDisponiveis.push({
+                id: entregadorIdCounter++,
+                nome: entregador.nome,
+                ativo: true,
+                criadoEm: new Date().toISOString()
+            });
+        }
+        
+        saveEntregadoresToStorage();
+        renderEntregadores();
+        updateEntregadorSelect();
+        
+        console.log('Entregadores padrão carregados');
+    } catch (error) {
+        console.error('Erro ao carregar entregadores padrão:', error);
+    }
+}
+function carregarEntregadoresPadrao() {
+    try {
+        var entregadoresPadrao = [
+            { nome: "João Silva", telefone: "(11) 99999-1111", veiculo: "Moto" },
+            { nome: "Maria Santos", telefone: "(11) 99999-2222", veiculo: "Bicicleta" },
+            { nome: "Pedro Costa", telefone: "(11) 99999-3333", veiculo: "Moto" },
+            { nome: "Ana Oliveira", telefone: "(11) 99999-4444", veiculo: "Carro" },
+            { nome: "Carlos Pereira", telefone: "(11) 99999-5555", veiculo: "Moto" }
+        ];
+        
+        for (var i = 0; i < entregadoresPadrao.length; i++) {
+            var entregador = entregadoresPadrao[i];
+            entregadoresDisponiveis.push({
+                id: entregadorIdCounter++,
+                nome: entregador.nome,
+                telefone: entregador.telefone,
+                veiculo: entregador.veiculo,
+                disponivel: true,
+                criadoEm: new Date().toISOString()
+            });
+        }
+        
+        saveEntregadoresToStorage();
+        renderEntregadores();
+        updateEntregadorSelect();
+        
+        console.log('Entregadores padrão carregados');
+    } catch (error) {
+        console.error('Erro ao carregar entregadores padrão:', error);
+    }
+}
+
+/**
  * Processa o envio do formulário de pratos
  */
 function handlePratoSubmit(event) {
@@ -388,6 +472,169 @@ function handlePratoSubmit(event) {
     } catch (error) {
         console.error('Erro ao adicionar prato:', error);
         showNotification('Erro ao adicionar prato: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Processa o envio do formulário de itens adicionais
+ */
+function handleAdicionalSubmit(event) {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+    
+    try {
+        var nomeAdicional = '';
+        var precoAdicional = 0;
+        
+        var nomeInput = document.getElementById('nomeAdicional');
+        var precoInput = document.getElementById('precoAdicional');
+        
+        if (nomeInput) {
+            nomeAdicional = nomeInput.value ? nomeInput.value.trim() : '';
+        }
+        
+        if (precoInput) {
+            precoAdicional = precoInput.value ? parseFloat(precoInput.value) : 0;
+        }
+        
+        if (!nomeAdicional) {
+            showNotification('Nome do item adicional é obrigatório!', 'error');
+            return;
+        }
+        
+        if (precoAdicional <= 0) {
+            showNotification('Preço deve ser maior que zero!', 'error');
+            return;
+        }
+        
+        // Verificar se o item já existe
+        var itemExistente = false;
+        for (var i = 0; i < itensAdicionais.length; i++) {
+            if (itensAdicionais[i].nome.toLowerCase() === nomeAdicional.toLowerCase()) {
+                itemExistente = true;
+                break;
+            }
+        }
+        
+        if (itemExistente) {
+            showNotification('Este item adicional já existe!', 'error');
+            return;
+        }
+        
+        // Criar novo item adicional
+        var novoItem = {
+            id: adicionalIdCounter++,
+            nome: nomeAdicional,
+            preco: precoAdicional,
+            disponivel: true,
+            criadoEm: new Date().toISOString()
+        };
+        
+        itensAdicionais.push(novoItem);
+        saveItensAdicionaisToStorage();
+        
+        // Limpar formulário
+        if (nomeInput) nomeInput.value = '';
+        if (precoInput) precoInput.value = '';
+        
+        // Renderizar itens atualizados
+        renderItensAdicionais();
+        updateItensAdicionaisForm();
+        
+        showNotification('Item adicional adicionado!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao adicionar item adicional:', error);
+        showNotification('Erro ao adicionar item adicional: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Processa o envio do formulário de entregadores
+ */
+function handleEntregadorSubmit(event) {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+    
+    try {
+        var nomeEntregador = '';
+        var telefoneEntregador = '';
+        var veiculoEntregador = '';
+        
+        var nomeInput = document.getElementById('nomeEntregador');
+        var telefoneInput = document.getElementById('telefoneEntregador');
+        var veiculoInput = document.getElementById('veiculoEntregador');
+        
+        if (nomeInput) {
+            nomeEntregador = nomeInput.value ? nomeInput.value.trim() : '';
+        }
+        
+        if (telefoneInput) {
+            telefoneEntregador = telefoneInput.value ? telefoneInput.value.trim() : '';
+        }
+        
+        if (veiculoInput) {
+            veiculoEntregador = veiculoInput.value ? veiculoInput.value.trim() : '';
+        }
+        
+        if (!nomeEntregador) {
+            showNotification('Nome do entregador é obrigatório!', 'error');
+            return;
+        }
+        
+        if (!telefoneEntregador) {
+            showNotification('Telefone é obrigatório!', 'error');
+            return;
+        }
+        
+        if (!veiculoEntregador) {
+            showNotification('Veículo é obrigatório!', 'error');
+            return;
+        }
+        
+        // Verificar se o entregador já existe
+        var entregadorExistente = false;
+        for (var i = 0; i < entregadoresDisponiveis.length; i++) {
+            if (entregadoresDisponiveis[i].nome.toLowerCase() === nomeEntregador.toLowerCase()) {
+                entregadorExistente = true;
+                break;
+            }
+        }
+        
+        if (entregadorExistente) {
+            showNotification('Este entregador já está cadastrado!', 'error');
+            return;
+        }
+        
+        // Criar novo entregador
+        var novoEntregador = {
+            id: entregadorIdCounter++,
+            nome: nomeEntregador,
+            telefone: telefoneEntregador,
+            veiculo: veiculoEntregador,
+            disponivel: true,
+            criadoEm: new Date().toISOString()
+        };
+        
+        entregadoresDisponiveis.push(novoEntregador);
+        saveEntregadoresToStorage();
+        
+        // Limpar formulário
+        if (nomeInput) nomeInput.value = '';
+        if (telefoneInput) telefoneInput.value = '';
+        if (veiculoInput) veiculoInput.value = '';
+        
+        // Renderizar entregadores atualizados
+        renderEntregadores();
+        updateEntregadorSelect();
+        
+        showNotification('Entregador cadastrado com sucesso!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao cadastrar entregador:', error);
+        showNotification('Erro ao cadastrar entregador: ' + error.message, 'error');
     }
 }
 
@@ -548,6 +795,49 @@ function renderItensAdicionais() {
 }
 
 /**
+ * Renderiza a lista de entregadores disponíveis
+ */
+function renderEntregadores() {
+    var entregadoresList = document.getElementById('entregadoresList');
+    
+    if (!entregadoresList) {
+        console.error('Elemento entregadoresList não encontrado');
+        return;
+    }
+    
+    if (entregadoresDisponiveis.length === 0) {
+        entregadoresList.innerHTML = '<div class="empty-entregadores">Nenhum entregador cadastrado. Adicione entregadores ao sistema.</div>';
+        return;
+    }
+    
+    // Ordenar entregadores por nome
+    var entregadoresOrdenados = entregadoresDisponiveis.slice().sort(function(a, b) {
+        return a.nome.localeCompare(b.nome);
+    });
+    
+    var html = '';
+    for (var i = 0; i < entregadoresOrdenados.length; i++) {
+        var entregador = entregadoresOrdenados[i];
+        var statusClass = entregador.disponivel ? 'entregador-disponivel' : 'entregador-indisponivel';
+        
+        html += '<div class="entregador-card ' + statusClass + '">';
+        html += '<div class="entregador-nome">' + entregador.nome + '</div>';
+        html += '<div class="entregador-info">';
+        html += '<span class="entregador-telefone">📞 ' + entregador.telefone + '</span>';
+        html += '<span class="entregador-veiculo">🚗 ' + entregador.veiculo + '</span>';
+        html += '</div>';
+        html += '<div class="entregador-actions">';
+        html += '<button class="btn-remove-entregador" onclick="removeEntregador(' + entregador.id + ')">';
+        html += '🗑️ Remover';
+        html += '</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    entregadoresList.innerHTML = html;
+}
+
+/**
  * Remove um prato do cardápio
  */
 function removePrato(pratoId) {
@@ -567,20 +857,46 @@ function removePrato(pratoId) {
 }
 
 /**
- * Remove um item adicional
+ * Atualiza o select de entregadores
  */
-function removeAdicional(adicionalId) {
-    var confirmacao = window.confirm('Tem certeza que deseja remover este item adicional?');
+function updateEntregadorSelect() {
+    var entregadorSelect = document.getElementById('entregador');
+    if (!entregadorSelect) return;
+    
+    var currentValue = entregadorSelect.value;
+    
+    // Limpa as opções atuais (mantém a primeira opção padrão)
+    entregadorSelect.innerHTML = '<option value="">Selecione um entregador</option>';
+    
+    // Adiciona os entregadores disponíveis
+    entregadoresDisponiveis.forEach(function(entregador) {
+        var option = document.createElement('option');
+        option.value = entregador.nome;
+        option.textContent = entregador.nome;
+        entregadorSelect.appendChild(option);
+    });
+    
+    // Restaura o valor selecionado se ainda existir
+    if (currentValue) {
+        entregadorSelect.value = currentValue;
+    }
+}
+
+/**
+ * Remove um entregador
+ */
+function removeEntregador(entregadorId) {
+    var confirmacao = window.confirm('Tem certeza que deseja remover este entregador?');
     
     if (confirmacao) {
-        itensAdicionais = itensAdicionais.filter(function(item) {
-            return item.id !== adicionalId;
+        entregadoresDisponiveis = entregadoresDisponiveis.filter(function(entregador) {
+            return entregador.id !== entregadorId;
         });
-        saveItensAdicionaisToStorage();
-        renderItensAdicionais();
-        updateItensAdicionaisForm();
+        saveEntregadoresToStorage();
+        renderEntregadores();
+        updateEntregadorSelect();
         
-        showNotification('Item adicional removido!', 'success');
+        showNotification('Entregador removido!', 'success');
     }
 }
 
@@ -732,6 +1048,9 @@ function handleFormSubmit(event) {
         // Renderizar tickets atualizados
         renderTickets();
         
+        // Atualizar formulário de itens adicionais para limpar seleções
+        updateItensAdicionaisForm();
+        
         // Feedback visual
         showNotification('Ticket criado com sucesso!', 'success');
     } catch (error) {
@@ -765,17 +1084,21 @@ function createTicketFromForm(formData) {
     const enderecoEntrega = document.getElementById('enderecoEntrega').value;
     
     // Coletar itens adicionais selecionados
-    const itensAdicionais = [];
+    const itensAdicionaisSelecionados = [];
     let valorAdicional = 0;
     
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    const checkboxes = document.querySelectorAll('#itensAdicionaisContainer input[type="checkbox"]:checked');
     checkboxes.forEach(checkbox => {
-        const item = checkbox.value;
-        itensAdicionais.push({
-            nome: item,
-            preco: PRECOS_ADICIONAIS[item]
-        });
-        valorAdicional += PRECOS_ADICIONAIS[item];
+        const adicionalId = parseInt(checkbox.value);
+        const item = itensAdicionais.find(adicional => adicional.id === adicionalId);
+        if (item) {
+            itensAdicionaisSelecionados.push({
+                id: item.id,
+                nome: item.nome,
+                preco: item.preco
+            });
+            valorAdicional += item.preco;
+        }
     });
     
     return {
@@ -783,7 +1106,7 @@ function createTicketFromForm(formData) {
         pratoId: pratoId,
         pratoPrincipal: pratoPrincipal,
         valorPrato: valorPrato,
-        itensAdicionais: itensAdicionais,
+        itensAdicionais: itensAdicionaisSelecionados,
         valorTotal: valorPrato + valorAdicional,
         entregador: entregador,
         dataEntrega: dataEntrega,
@@ -1019,6 +1342,64 @@ function loadPratosFromStorage() {
         const data = JSON.parse(savedData);
         pratosDisponiveis = data.pratos || [];
         pratoIdCounter = data.pratoIdCounter || 1;
+    }
+}
+
+/**
+ * Salva entregadores no localStorage
+ */
+function saveEntregadoresToStorage() {
+    try {
+        const dataToSave = {
+            entregadores: entregadoresDisponiveis,
+            entregadorIdCounter: entregadorIdCounter
+        };
+        localStorage.setItem('justdelivery_entregadores', JSON.stringify(dataToSave));
+        console.log('Entregadores salvos:', entregadoresDisponiveis);
+    } catch (error) {
+        console.error('Erro ao salvar entregadores:', error);
+        showNotification('Erro ao salvar entregadores!', 'error');
+    }
+}
+
+/**
+ * Carrega entregadores do localStorage
+ */
+function loadEntregadoresFromStorage() {
+    try {
+        const savedData = localStorage.getItem('justdelivery_entregadores');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            entregadoresDisponiveis = data.entregadores || [];
+            entregadorIdCounter = data.entregadorIdCounter || 1;
+            console.log('Entregadores carregados:', entregadoresDisponiveis);
+        }
+    } catch (error) {
+        console.error('Erro ao carregar entregadores:', error);
+        entregadoresDisponiveis = []; // Reset em caso de erro
+    }
+}
+
+/**
+ * Salva itens adicionais no localStorage
+ */
+function saveItensAdicionaisToStorage() {
+    const dataToSave = {
+        itensAdicionais: itensAdicionais,
+        adicionalIdCounter: adicionalIdCounter
+    };
+    localStorage.setItem('justdelivery_itens_adicionais', JSON.stringify(dataToSave));
+}
+
+/**
+ * Carrega itens adicionais do localStorage
+ */
+function loadItensAdicionaisFromStorage() {
+    const savedData = localStorage.getItem('justdelivery_itens_adicionais');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        itensAdicionais = data.itensAdicionais || [];
+        adicionalIdCounter = data.adicionalIdCounter || 1;
     }
 }
 

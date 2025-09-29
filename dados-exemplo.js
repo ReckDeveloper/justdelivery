@@ -7,8 +7,8 @@ const DADOS_EXEMPLO = {
       pratoPrincipal: "Arroz, feijão e frango à milanesa",
       valorPrato: 18.50,
       itensAdicionais: [
-        { nome: "refrigerante", preco: 5.00 },
-        { nome: "sobremesa", preco: 8.00 }
+        { id: 1, nome: "Refrigerante", preco: 5.00 },
+        { id: 2, nome: "Sobremesa", preco: 8.00 }
       ],
       valorTotal: 31.50,
       entregador: "João Silva",
@@ -25,8 +25,8 @@ const DADOS_EXEMPLO = {
       pratoPrincipal: "Arroz, feijão e calabresa",
       valorPrato: 16.90,
       itensAdicionais: [
-        { nome: "batata", preco: 6.00 },
-        { nome: "refrigerante", preco: 5.00 }
+        { id: 3, nome: "Batata Frita", preco: 6.00 },
+        { id: 1, nome: "Refrigerante", preco: 5.00 }
       ],
       valorTotal: 27.90,
       entregador: "Maria Santos",
@@ -43,7 +43,7 @@ const DADOS_EXEMPLO = {
       pratoPrincipal: "Feijoada completa",
       valorPrato: 25.90,
       itensAdicionais: [
-        { nome: "sobremesa", preco: 8.00 }
+        { id: 2, nome: "Sobremesa", preco: 8.00 }
       ],
       valorTotal: 33.90,
       entregador: "Pedro Costa",
@@ -66,7 +66,23 @@ const DADOS_EXEMPLO = {
     { id: 7, nome: "Arroz, feijão e carne de porco", preco: 18.90, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" },
     { id: 8, nome: "Feijoada completa", preco: 25.90, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" }
   ],
-  pratoIdCounter: 9
+  pratoIdCounter: 9,
+  itensAdicionais: [
+    { id: 1, nome: "Refrigerante", preco: 5.00, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 2, nome: "Sobremesa", preco: 8.00, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 3, nome: "Batata Frita", preco: 6.00, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 4, nome: "Suco Natural", preco: 4.50, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 5, nome: "Salada", preco: 3.50, disponivel: true, criadoEm: "2025-09-28T10:00:00.000Z" }
+  ],
+  adicionalIdCounter: 6,
+  entregadores: [
+    { id: 1, nome: "João Silva", ativo: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 2, nome: "Maria Santos", ativo: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 3, nome: "Pedro Costa", ativo: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 4, nome: "Ana Oliveira", ativo: true, criadoEm: "2025-09-28T10:00:00.000Z" },
+    { id: 5, nome: "Carlos Ferreira", ativo: true, criadoEm: "2025-09-28T10:00:00.000Z" }
+  ],
+  entregadorIdCounter: 6
 };
 
 // Entregadores disponíveis
@@ -131,10 +147,20 @@ function carregarDadosExemplo() {
     ticketIdCounter = DADOS_EXEMPLO.ticketIdCounter;
     pratosDisponiveis = DADOS_EXEMPLO.pratos;
     pratoIdCounter = DADOS_EXEMPLO.pratoIdCounter;
+    itensAdicionais = DADOS_EXEMPLO.itensAdicionais;
+    adicionalIdCounter = DADOS_EXEMPLO.adicionalIdCounter;
+    entregadoresDisponiveis = DADOS_EXEMPLO.entregadores;
+    entregadorIdCounter = DADOS_EXEMPLO.entregadorIdCounter;
     
     saveTicketsToStorage();
     savePratosToStorage();
+    saveItensAdicionaisToStorage();
+    saveEntregadoresToStorage();
     renderPratos();
+    renderItensAdicionais();
+    renderEntregadores();
+    updateItensAdicionaisForm();
+    updateEntregadorSelect();
     renderTickets();
     updatePratoSelect();
     
@@ -155,10 +181,20 @@ function limparTodosOsDados() {
     ticketIdCounter = 1;
     pratosDisponiveis = [];
     pratoIdCounter = 1;
+    itensAdicionais = [];
+    adicionalIdCounter = 1;
+    entregadoresDisponiveis = [];
+    entregadorIdCounter = 1;
     
     localStorage.removeItem('justdelivery_tickets');
     localStorage.removeItem('justdelivery_pratos');
+    localStorage.removeItem('justdelivery_itens_adicionais');
+    localStorage.removeItem('justdelivery_entregadores');
     renderPratos();
+    renderItensAdicionais();
+    renderEntregadores();
+    updateItensAdicionaisForm();
+    updateEntregadorSelect();
     renderTickets();
     updatePratoSelect();
     
@@ -173,6 +209,10 @@ function exportarDados() {
     ticketIdCounter: ticketIdCounter,
     pratos: pratosDisponiveis,
     pratoIdCounter: pratoIdCounter,
+    itensAdicionais: itensAdicionais,
+    adicionalIdCounter: adicionalIdCounter,
+    entregadores: entregadoresDisponiveis,
+    entregadorIdCounter: entregadorIdCounter,
     exportadoEm: new Date().toISOString(),
     versao: "2.0"
   };

@@ -103,6 +103,37 @@
                 <div id="adicionaisList" class="adicionais-list"></div>
             </section>
 
+            <!-- Cadastro de Entregadores -->
+            <section class="entregadores-section">
+                <h2>Entregadores</h2>
+                <div class="entregadores-cadastro">
+                    <form id="entregadorForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nomeEntregador">Nome do Entregador:</label>
+                                <input type="text" id="nomeEntregador" placeholder="Ex: João Silva" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="telefoneEntregador">Telefone:</label>
+                                <input type="tel" id="telefoneEntregador" placeholder="(11) 99999-9999" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="veiculoEntregador">Veículo:</label>
+                                <select id="veiculoEntregador" required>
+                                    <option value="">Selecione o veículo</option>
+                                    <option value="Moto">Moto</option>
+                                    <option value="Bicicleta">Bicicleta</option>
+                                    <option value="Carro">Carro</option>
+                                    <option value="A pé">A pé</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-add-entregador">+ Adicionar</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="entregadoresList" class="entregadores-list"></div>
+            </section>
+
             <div class="desktop-grid">
                 <!-- Formulário de Novo Ticket -->
                 <section class="form-section">

@@ -293,6 +293,37 @@
             </div>
         </div>
         
+        <!-- Seção de Entregadores -->
+        <div class="section">
+            <h2>Entregadores</h2>
+            
+            <form id="entregadorForm" onsubmit="adicionarEntregador(event)">
+                <div class="form-group">
+                    <label for="nomeEntregador">Nome do Entregador:</label>
+                    <input type="text" id="nomeEntregador" placeholder="Ex: João Silva" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefoneEntregador">Telefone:</label>
+                    <input type="tel" id="telefoneEntregador" placeholder="(11) 99999-9999" required>
+                </div>
+                <div class="form-group">
+                    <label for="veiculoEntregador">Veículo:</label>
+                    <select id="veiculoEntregador" required>
+                        <option value="">Selecione o veículo</option>
+                        <option value="Moto">Moto</option>
+                        <option value="Bicicleta">Bicicleta</option>
+                        <option value="Carro">Carro</option>
+                        <option value="A pé">A pé</option>
+                    </select>
+                </div>
+                <button type="submit">+ Adicionar Entregador</button>
+            </form>
+            
+            <div id="entregadoresList">
+                <p style="text-align: center; color: #666; padding: 20px;">Carregando entregadores...</p>
+            </div>
+        </div>
+        
         <!-- Seção de Novo Ticket -->
         <div class="section">
             <h2>Novo Ticket de Entrega</h2>
@@ -321,10 +352,7 @@
                     <label for="entregador">Entregador:</label>
                     <select id="entregador" required>
                         <option value="">Selecione um entregador</option>
-                        <option value="João Silva">João Silva</option>
-                        <option value="Maria Santos">Maria Santos</option>
-                        <option value="Pedro Costa">Pedro Costa</option>
-                        <option value="Ana Oliveira">Ana Oliveira</option>
+                        <!-- Entregadores serão carregados dinamicamente aqui -->
                     </select>
                 </div>
                 
@@ -361,6 +389,7 @@
         var APP_PRATOS = [];
         var APP_TICKETS = [];
         var APP_ADICIONAIS = [];
+        var APP_ENTREGADORES = [];
         
         var ADICIONAIS_PADRAO = {
             refrigerante: { nome: 'Refrigerante', preco: 5.00 },
@@ -399,7 +428,8 @@
                     localStorage.setItem('app_pratos', JSON.stringify(APP_PRATOS));
                     localStorage.setItem('app_tickets', JSON.stringify(APP_TICKETS));
                     localStorage.setItem('app_adicionais', JSON.stringify(APP_ADICIONAIS));
-                    log('Dados salvos: ' + APP_PRATOS.length + ' pratos, ' + APP_TICKETS.length + ' tickets, ' + APP_ADICIONAIS.length + ' adicionais');
+                    localStorage.setItem('app_entregadores', JSON.stringify(APP_ENTREGADORES));
+                    log('Dados salvos: ' + APP_PRATOS.length + ' pratos, ' + APP_TICKETS.length + ' tickets, ' + APP_ADICIONAIS.length + ' adicionais, ' + APP_ENTREGADORES.length + ' entregadores');
                 } else {
                     log('AVISO: localStorage indisponível');
                 }
@@ -415,6 +445,7 @@
                     var pratos = localStorage.getItem('app_pratos');
                     var tickets = localStorage.getItem('app_tickets');
                     var adicionais = localStorage.getItem('app_adicionais');
+                    var entregadores = localStorage.getItem('app_entregadores');
                     
                     if (pratos) {
                         APP_PRATOS = JSON.parse(pratos);
@@ -430,12 +461,18 @@
                         APP_ADICIONAIS = JSON.parse(adicionais);
                         log('Adicionais carregados: ' + APP_ADICIONAIS.length);
                     }
+                    
+                    if (entregadores) {
+                        APP_ENTREGADORES = JSON.parse(entregadores);
+                        log('Entregadores carregados: ' + APP_ENTREGADORES.length);
+                    }
                 }
             } catch (e) {
                 log('ERRO ao carregar: ' + e.message);
                 APP_PRATOS = [];
                 APP_TICKETS = [];
                 APP_ADICIONAIS = [];
+                APP_ENTREGADORES = [];
             }
         }
 
@@ -455,6 +492,13 @@
                 { id: 1, nome: 'Refrigerante', preco: 5.00, ativo: true },
                 { id: 2, nome: 'Sobremesa', preco: 8.00, ativo: true },
                 { id: 3, nome: 'Batata Frita', preco: 6.00, ativo: true }
+            ];
+            
+            APP_ENTREGADORES = [
+                { id: 1, nome: 'João Silva', telefone: '(11) 99999-1111', veiculo: 'Moto', ativo: true },
+                { id: 2, nome: 'Maria Santos', telefone: '(11) 99999-2222', veiculo: 'Bicicleta', ativo: true },
+                { id: 3, nome: 'Pedro Costa', telefone: '(11) 99999-3333', veiculo: 'Moto', ativo: true },
+                { id: 4, nome: 'Ana Oliveira', telefone: '(11) 99999-4444', veiculo: 'Carro', ativo: true }
             ];
             
             APP_TICKETS = [];
@@ -521,6 +565,39 @@
             log('Itens adicionais renderizados!');
         }
 
+        // Renderizar entregadores
+        function renderizarEntregadores() {
+            log('Renderizando ' + APP_ENTREGADORES.length + ' entregadores...');
+            
+            var container = document.getElementById('entregadoresList');
+            if (!container) {
+                log('ERRO: Container entregadoresList não encontrado');
+                return;
+            }
+
+            if (APP_ENTREGADORES.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhum entregador cadastrado</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < APP_ENTREGADORES.length; i++) {
+                var entregador = APP_ENTREGADORES[i];
+                var statusClass = entregador.ativo ? '' : 'style="opacity: 0.6;"';
+                html += '<div class="prato-item" ' + statusClass + '>';
+                html += '<span><strong>' + entregador.nome + '</strong><br>';
+                html += 'Tel: ' + entregador.telefone + '<br>';
+                html += 'Veículo: ' + entregador.veiculo;
+                html += entregador.ativo ? ' (Ativo)' : ' (Inativo)';
+                html += '</span>';
+                html += '<button onclick="removerEntregador(' + i + ')">Remover</button>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+            log('Entregadores renderizados!');
+        }
+
         // Atualizar select
         function atualizarSelect() {
             log('Atualizando select com ' + APP_PRATOS.length + ' pratos...');
@@ -573,6 +650,28 @@
             
             container.innerHTML = html;
             log('Itens adicionais do formulário atualizados!');
+        }
+
+        // Atualizar select de entregadores
+        function atualizarSelectEntregadores() {
+            log('Atualizando select com ' + APP_ENTREGADORES.length + ' entregadores...');
+            
+            var select = document.getElementById('entregador');
+            if (!select) {
+                log('ERRO: Select entregador não encontrado');
+                return;
+            }
+
+            var html = '<option value="">Selecione um entregador</option>';
+            for (var i = 0; i < APP_ENTREGADORES.length; i++) {
+                var entregador = APP_ENTREGADORES[i];
+                if (entregador.ativo) {
+                    html += '<option value="' + entregador.nome + '">' + entregador.nome + ' (' + entregador.veiculo + ')</option>';
+                }
+            }
+            
+            select.innerHTML = html;
+            log('Select entregadores atualizado!');
         }
 
         // Adicionar prato
@@ -642,6 +741,47 @@
             log('Item adicional adicionado: ' + nome);
         }
 
+        // Adicionar entregador
+        function adicionarEntregador(event) {
+            event.preventDefault();
+            log('Adicionando novo entregador...');
+            
+            var nome = document.getElementById('nomeEntregador').value.trim();
+            var telefone = document.getElementById('telefoneEntregador').value.trim();
+            var veiculo = document.getElementById('veiculoEntregador').value;
+            
+            if (!nome || !telefone || !veiculo) {
+                alert('Preencha todos os campos!');
+                return;
+            }
+            
+            // Verificar se já existe
+            for (var i = 0; i < APP_ENTREGADORES.length; i++) {
+                if (APP_ENTREGADORES[i].nome.toLowerCase() === nome.toLowerCase()) {
+                    alert('Este entregador já está cadastrado!');
+                    return;
+                }
+            }
+            
+            APP_ENTREGADORES.push({
+                id: Date.now(),
+                nome: nome,
+                telefone: telefone,
+                veiculo: veiculo,
+                ativo: true
+            });
+            
+            document.getElementById('nomeEntregador').value = '';
+            document.getElementById('telefoneEntregador').value = '';
+            document.getElementById('veiculoEntregador').value = '';
+            
+            salvarDados();
+            renderizarEntregadores();
+            atualizarSelectEntregadores();
+            
+            log('Entregador adicionado: ' + nome);
+        }
+
         // Remover prato
         function removerPrato(index) {
             if (index >= 0 && index < APP_PRATOS.length) {
@@ -663,6 +803,18 @@
                 renderizarAdicionais();
                 atualizarItensAdicionaisForm();
                 log('Item adicional removido: ' + nome);
+            }
+        }
+
+        // Remover entregador
+        function removerEntregador(index) {
+            if (index >= 0 && index < APP_ENTREGADORES.length) {
+                var nome = APP_ENTREGADORES[index].nome;
+                APP_ENTREGADORES.splice(index, 1);
+                salvarDados();
+                renderizarEntregadores();
+                atualizarSelectEntregadores();
+                log('Entregador removido: ' + nome);
             }
         }
 
@@ -845,7 +997,9 @@
             log('3. Renderizando interface...');
             renderizarPratos();
             renderizarAdicionais();
+            renderizarEntregadores();
             atualizarSelect();
+            atualizarSelectEntregadores();
             atualizarItensAdicionaisForm();
             renderizarTickets();
             
@@ -861,7 +1015,9 @@
             carregarExemplo();
             renderizarPratos();
             renderizarAdicionais();
+            renderizarEntregadores();
             atualizarSelect();
+            atualizarSelectEntregadores();
             atualizarItensAdicionaisForm();
             renderizarTickets();
             alert('Dados forçados!');
@@ -871,15 +1027,19 @@
             log('Limpando todos os dados...');
             APP_PRATOS = [];
             APP_ADICIONAIS = [];
+            APP_ENTREGADORES = [];
             APP_TICKETS = [];
             if (testarStorage()) {
                 localStorage.removeItem('app_pratos');
                 localStorage.removeItem('app_adicionais');
+                localStorage.removeItem('app_entregadores');
                 localStorage.removeItem('app_tickets');
             }
             renderizarPratos();
             renderizarAdicionais();
+            renderizarEntregadores();
             atualizarSelect();
+            atualizarSelectEntregadores();
             atualizarItensAdicionaisForm();
             renderizarTickets();
             alert('Dados limpos!');
@@ -891,6 +1051,7 @@
             info += 'Dados em memória:\n';
             info += '• Pratos: ' + APP_PRATOS.length + '\n';
             info += '• Itens Adicionais: ' + APP_ADICIONAIS.length + '\n';
+            info += '• Entregadores: ' + APP_ENTREGADORES.length + '\n';
             info += '• Tickets: ' + APP_TICKETS.length + '\n\n';
             info += 'LocalStorage:\n';
             info += '• Disponível: ' + testarStorage() + '\n';
@@ -898,16 +1059,20 @@
             if (testarStorage()) {
                 var pratos = localStorage.getItem('app_pratos');
                 var adicionais = localStorage.getItem('app_adicionais');
+                var entregadores = localStorage.getItem('app_entregadores');
                 var tickets = localStorage.getItem('app_tickets');
                 info += '• Pratos salvos: ' + (pratos ? JSON.parse(pratos).length : 0) + '\n';
                 info += '• Adicionais salvos: ' + (adicionais ? JSON.parse(adicionais).length : 0) + '\n';
+                info += '• Entregadores salvos: ' + (entregadores ? JSON.parse(entregadores).length : 0) + '\n';
                 info += '• Tickets salvos: ' + (tickets ? JSON.parse(tickets).length : 0) + '\n';
             }
             
             info += '\nElementos DOM:\n';
             info += '• pratosList: ' + (document.getElementById('pratosList') ? 'OK' : 'ERRO') + '\n';
             info += '• adicionaisList: ' + (document.getElementById('adicionaisList') ? 'OK' : 'ERRO') + '\n';
+            info += '• entregadoresList: ' + (document.getElementById('entregadoresList') ? 'OK' : 'ERRO') + '\n';
             info += '• pratoPrincipal: ' + (document.getElementById('pratoPrincipal') ? 'OK' : 'ERRO') + '\n';
+            info += '• entregador: ' + (document.getElementById('entregador') ? 'OK' : 'ERRO') + '\n';
             info += '• itensAdicionaisContainer: ' + (document.getElementById('itensAdicionaisContainer') ? 'OK' : 'ERRO') + '\n';
             info += '• ticketsList: ' + (document.getElementById('ticketsList') ? 'OK' : 'ERRO') + '\n';
             
@@ -942,10 +1107,26 @@
                     }
                 }
                 
+                if (APP_ENTREGADORES.length === 0) {
+                    log('Nenhum entregador encontrado, carregando padrão...');
+                    // Se não carregou do exemplo, criar os padrão
+                    if (APP_PRATOS.length > 0) {
+                        APP_ENTREGADORES = [
+                            { id: 1, nome: 'João Silva', telefone: '(11) 99999-1111', veiculo: 'Moto', ativo: true },
+                            { id: 2, nome: 'Maria Santos', telefone: '(11) 99999-2222', veiculo: 'Bicicleta', ativo: true },
+                            { id: 3, nome: 'Pedro Costa', telefone: '(11) 99999-3333', veiculo: 'Moto', ativo: true },
+                            { id: 4, nome: 'Ana Oliveira', telefone: '(11) 99999-4444', veiculo: 'Carro', ativo: true }
+                        ];
+                        salvarDados();
+                    }
+                }
+                
                 log('3. Renderizando interface...');
                 renderizarPratos();
                 renderizarAdicionais();
+                renderizarEntregadores();
                 atualizarSelect();
+                atualizarSelectEntregadores();
                 atualizarItensAdicionaisForm();
                 renderizarTickets();
                 
@@ -955,6 +1136,7 @@
                 log('=== SISTEMA INICIADO COM SUCESSO ===');
                 log('Pratos disponíveis: ' + APP_PRATOS.length);
                 log('Itens adicionais: ' + APP_ADICIONAIS.length);
+                log('Entregadores: ' + APP_ENTREGADORES.length);
                 log('Tickets existentes: ' + APP_TICKETS.length);
                 
                 // Ocultar debug após 5 segundos
@@ -981,8 +1163,10 @@
         // Expor funções globalmente
         window.adicionarPrato = adicionarPrato;
         window.adicionarAdicional = adicionarAdicional;
+        window.adicionarEntregador = adicionarEntregador;
         window.removerPrato = removerPrato;
         window.removerAdicional = removerAdicional;
+        window.removerEntregador = removerEntregador;
         window.criarTicket = criarTicket;
         window.removerTicket = removerTicket;
         window.atualizarValor = atualizarValor;
