@@ -1187,7 +1187,11 @@ function createTicketHTML(ticket) {
         <div class="ticket-card" data-ticket-id="${ticket.id}">
             <div class="ticket-header">
                 <span class="ticket-id">Ticket #${ticket.id.toString().padStart(3, '0')}</span>
-                <span class="status-badge ${statusClass}">${formatStatus(ticket.status)}</span>
+                <select class="status-badge-select ${statusClass}" onchange="updateTicketStatusDirect(${ticket.id}, this.value)">
+                    <option value="pendente" ${ticket.status === 'pendente' ? 'selected' : ''}>🕐 Pendente</option>
+                    <option value="em-transito" ${ticket.status === 'em-transito' ? 'selected' : ''}>🚚 Em Trânsito</option>
+                    <option value="entregue" ${ticket.status === 'entregue' ? 'selected' : ''}>✅ Entregue</option>
+                </select>
             </div>
             
             <div class="ticket-details">
@@ -1230,20 +1234,62 @@ function createTicketHTML(ticket) {
  * Cria botões de ação baseados no status do ticket
  */
 function createActionButtons(ticket) {
+    // Adiciona dropdown de mudança de status + botões de ação
+    const statusSelect = createStatusSelector(ticket);
+    
+    let actionButtons = '';
     switch (ticket.status) {
         case 'pendente':
-            return `<button class="btn-action btn-transito" onclick="updateTicketStatus(${ticket.id}, 'em-transito')">
+            actionButtons = `<button class="btn-action btn-transito" onclick="updateTicketStatus(${ticket.id}, 'em-transito')">
                         🚚 Iniciar Entrega
                     </button>`;
+            break;
         case 'em-transito':
-            return `<button class="btn-action btn-entregar" onclick="updateTicketStatus(${ticket.id}, 'entregue')">
+            actionButtons = `<button class="btn-action btn-entregar" onclick="updateTicketStatus(${ticket.id}, 'entregue')">
                         ✅ Confirmar Entrega
                     </button>`;
+            break;
         case 'entregue':
-            return `<span style="color: #38a169; font-weight: 600;">✅ Entrega Concluída</span>`;
+            actionButtons = `<span style="color: #38a169; font-weight: 600;">✅ Entrega Concluída</span>`;
+            break;
         default:
-            return '';
+            actionButtons = '';
     }
+    
+    return `
+        <div class="ticket-actions">
+            <div class="status-controls">
+                <label>Alterar Status:</label>
+                ${statusSelect}
+            </div>
+            <div class="action-buttons">
+                ${actionButtons}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Cria um seletor de status para o ticket
+ */
+function createStatusSelector(ticket) {
+    const statuses = [
+        { value: 'pendente', label: '🕐 Pendente' },
+        { value: 'em-transito', label: '🚚 Em Trânsito' },
+        { value: 'entregue', label: '✅ Entregue' }
+    ];
+    
+    let options = '';
+    statuses.forEach(status => {
+        const selected = status.value === ticket.status ? 'selected' : '';
+        options += `<option value="${status.value}" ${selected}>${status.label}</option>`;
+    });
+    
+    return `
+        <select class="status-selector" onchange="updateTicketStatus(${ticket.id}, this.value)">
+            ${options}
+        </select>
+    `;
 }
 
 /**
@@ -1259,20 +1305,174 @@ function addActionButtonListeners() {
  */
 function updateTicketStatus(ticketId, newStatus) {
     const ticket = deliveryTickets.find(t => t.id === ticketId);
-    if (ticket) {
-        ticket.status = newStatus;
-        ticket.atualizadoEm = new Date().toISOString();
-        
+    if (!ticket) {
+        showNotification('Ticket não encontrado!', 'error');
+        return;
+    }
+    
+    // Validar se o status é válido
+    const validStatuses = ['pendente', 'em-transito', 'entregue'];
+    if (!validStatuses.includes(newStatus)) {
+        showNotification('Status inválido!', 'error');
+        return;
+    }
+    
+    const oldStatus = ticket.status;
+    
+    // Não fazer nada se o status não mudou
+    if (oldStatus === newStatus) {
+        return;
+    }
+    
+    // Atualizar o ticket
+    ticket.status = newStatus;
+    ticket.atualizadoEm = new Date().toISOString();
+    
+    // Adicionar timestamp específico baseado no status
+    const now = new Date().toISOString();
+    switch (newStatus) {
+        case 'em-transito':
+            ticket.iniciadoEm = now;
+            break;
+        case 'entregue':
+            ticket.entregueEm = now;
+            break;
+    }
+    
+    saveTicketsToStorage();
+    renderTickets();
+    
+    const statusMessages = {
+        'pendente': 'Ticket marcado como pendente',
+        'em-transito': '🚚 Entrega iniciada!',
+        'entregue': '✅ Entrega confirmada com sucesso!'
+    };
+    
+    const changeMessage = `Status alterado: ${formatStatus(oldStatus)} → ${formatStatus(newStatus)}`;
+    showNotification(statusMessages[newStatus] || changeMessage, 'success');
+    
+    console.log(`Ticket ${ticketId}: ${oldStatus} → ${newStatus}`);
+}
+
+/**
+ * Atualiza o status de um ticket diretamente do campo de status
+ */
+function updateTicketStatusDirect(ticketId, newStatus) {
+    const ticket = deliveryTickets.find(t => t.id === ticketId);
+    if (!ticket) {
+        showNotification('Ticket não encontrado!', 'error');
+        return;
+    }
+    
+    // Validar se o status é válido
+    const validStatuses = ['pendente', 'em-transito', 'entregue'];
+    if (!validStatuses.includes(newStatus)) {
+        showNotification('Status inválido!', 'error');
+        return;
+    }
+    
+    const oldStatus = ticket.status;
+    
+    // Não fazer nada se o status não mudou
+    if (oldStatus === newStatus) {
+        return;
+    }
+    
+    // Atualizar o ticket
+    ticket.status = newStatus;
+    ticket.atualizadoEm = new Date().toISOString();
+    
+    // Adicionar timestamp específico baseado no status
+    const now = new Date().toISOString();
+    switch (newStatus) {
+        case 'em-transito':
+            ticket.iniciadoEm = now;
+            break;
+        case 'entregue':
+            ticket.entregueEm = now;
+            break;
+    }
+    
+    // Salvar no localStorage
+    saveTicketsToStorage();
+    
+    // Atualizar apenas a aparência visual do select atual (sem re-renderizar toda a lista)
+    const ticketCard = document.querySelector(`.ticket-card[data-ticket-id="${ticketId}"]`);
+    if (ticketCard) {
+        const statusSelect = ticketCard.querySelector('.status-badge-select');
+        if (statusSelect) {
+            // Atualizar classes CSS baseadas no novo status
+            statusSelect.className = `status-badge-select status-${newStatus}`;
+        }
+    }
+    
+    // Mostrar notificação
+    const statusMessages = {
+        'pendente': 'Ticket marcado como pendente',
+        'em-transito': '🚚 Entrega iniciada!',
+        'entregue': '✅ Entrega confirmada com sucesso!'
+    };
+    
+    const changeMessage = `Status alterado: ${formatStatus(oldStatus)} → ${formatStatus(newStatus)}`;
+    showNotification(statusMessages[newStatus] || changeMessage, 'success');
+    
+    console.log(`Status atualizado diretamente - Ticket ${ticketId}: ${oldStatus} → ${newStatus}`);
+}
+
+/**
+ * Atualiza status de múltiplos tickets (funcionalidade avançada)
+ */
+function updateMultipleTicketsStatus(ticketIds, newStatus) {
+    if (!Array.isArray(ticketIds) || ticketIds.length === 0) {
+        showNotification('Nenhum ticket selecionado!', 'error');
+        return;
+    }
+    
+    const validStatuses = ['pendente', 'em-transito', 'entregue'];
+    if (!validStatuses.includes(newStatus)) {
+        showNotification('Status inválido!', 'error');
+        return;
+    }
+    
+    let updatedCount = 0;
+    const now = new Date().toISOString();
+    
+    ticketIds.forEach(ticketId => {
+        const ticket = deliveryTickets.find(t => t.id === ticketId);
+        if (ticket && ticket.status !== newStatus) {
+            ticket.status = newStatus;
+            ticket.atualizadoEm = now;
+            
+            // Adicionar timestamp específico
+            switch (newStatus) {
+                case 'em-transito':
+                    ticket.iniciadoEm = now;
+                    break;
+                case 'entregue':
+                    ticket.entregueEm = now;
+                    break;
+            }
+            
+            updatedCount++;
+        }
+    });
+    
+    if (updatedCount > 0) {
         saveTicketsToStorage();
         renderTickets();
-        
-        const statusMessages = {
-            'em-transito': 'Entrega iniciada!',
-            'entregue': 'Entrega confirmada com sucesso!'
-        };
-        
-        showNotification(statusMessages[newStatus], 'success');
+        showNotification(`${updatedCount} ticket(s) atualizado(s) para: ${formatStatus(newStatus)}`, 'success');
+    } else {
+        showNotification('Nenhum ticket foi atualizado', 'info');
     }
+}
+
+/**
+ * Adiciona funcionalidade de seleção múltipla (para futuras implementações)
+ */
+function toggleTicketSelection(ticketId) {
+    // Esta função pode ser expandida para permitir seleção múltipla
+    // Por enquanto, apenas registra a ação
+    console.log(`Ticket ${ticketId} selecionado para ações em lote`);
 }
 
 /**

@@ -951,7 +951,12 @@
                 html += '<p><strong>Entregador:</strong> ' + ticket.entregador + '</p>';
                 html += '<p><strong>Data/Hora Prevista:</strong> ' + ticket.data + ' às ' + ticket.hora + '</p>';
                 html += '<p><strong>Endereço:</strong> ' + ticket.endereco + '</p>';
-                html += '<p><strong>Status:</strong> <span style="color: #d69e2e;">' + ticket.status + '</span></p>';
+                html += '<p><strong>Status:</strong> ';
+                html += '<select class="status-select" onchange="alterarStatusTicket(' + i + ', this.value)" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; background: white;">';
+                html += '<option value="Pendente"' + (ticket.status === 'Pendente' ? ' selected' : '') + '>🕐 Pendente</option>';
+                html += '<option value="Em Trânsito"' + (ticket.status === 'Em Trânsito' ? ' selected' : '') + '>🚚 Em Trânsito</option>';
+                html += '<option value="Entregue"' + (ticket.status === 'Entregue' ? ' selected' : '') + '>✅ Entregue</option>';
+                html += '</select></p>';
                 html += '<p style="color: #666; font-size: 12px; margin-top: 10px;">Criado: ' + ticket.criacao + '</p>';
                 html += '</div>';
             }
@@ -968,6 +973,45 @@
                 salvarDados();
                 renderizarTickets();
                 log('Ticket removido: #' + id);
+            }
+        }
+
+        // Alterar status do ticket
+        function alterarStatusTicket(index, novoStatus) {
+            if (index >= 0 && index < APP_TICKETS.length) {
+                var ticket = APP_TICKETS[index];
+                var statusAnterior = ticket.status;
+                
+                if (statusAnterior === novoStatus) {
+                    return; // Não fazer nada se o status não mudou
+                }
+                
+                ticket.status = novoStatus;
+                ticket.ultimaAtualizacao = new Date().toLocaleString();
+                
+                // Adicionar timestamp específico baseado no status
+                var agora = new Date().toLocaleString();
+                switch (novoStatus) {
+                    case 'Em Trânsito':
+                        ticket.iniciadoEm = agora;
+                        break;
+                    case 'Entregue':
+                        ticket.entregueEm = agora;
+                        break;
+                }
+                
+                salvarDados();
+                log('Status alterado - Ticket #' + ticket.id + ': ' + statusAnterior + ' → ' + novoStatus);
+                
+                // Mostrar feedback visual
+                var selects = document.querySelectorAll('.status-select');
+                if (selects[APP_TICKETS.length - 1 - index]) {
+                    var select = selects[APP_TICKETS.length - 1 - index];
+                    select.style.background = '#e6fffa';
+                    setTimeout(function() {
+                        select.style.background = 'white';
+                    }, 1000);
+                }
             }
         }
 

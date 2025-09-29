@@ -1122,3 +1122,170 @@ main {
         min-height: 20px;
     }
 }
+
+/* Controles de Status de Ticket */
+.ticket-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.status-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.status-controls label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.status-selector {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+}
+
+.status-selector:hover {
+    border-color: #667eea;
+    background: #fff;
+}
+
+.status-selector:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Melhorias responsivas para controles de status */
+@media (max-width: 768px) {
+    .ticket-actions {
+        gap: 12px;
+    }
+    
+    .status-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .status-selector {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+    
+    .action-buttons {
+        width: 100%;
+    }
+    
+    .action-buttons .btn-action {
+        flex: 1;
+        min-height: 44px;
+        font-size: 0.95em;
+    }
+}
+
+/* Status Badge Select - Substitui o badge por select editável */
+.status-badge-select {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #4a5568;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    min-width: 130px;
+    text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+    padding-right: 28px;
+}
+
+.status-badge-select:hover {
+    border-color: #667eea;
+    background-color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background-color: #fff;
+}
+
+/* Status-specific colors for the select */
+.status-badge-select.status-pendente {
+    background-color: #fef5e7;
+    border-color: #f6ad55;
+    color: #c05621;
+}
+
+.status-badge-select.status-pendente:hover {
+    background-color: #fed7aa;
+    border-color: #dd6b20;
+}
+
+.status-badge-select.status-em-transito {
+    background-color: #e6fffa;
+    border-color: #4fd1c7;
+    color: #234e52;
+}
+
+.status-badge-select.status-em-transito:hover {
+    background-color: #b2f5ea;
+    border-color: #38b2ac;
+}
+
+.status-badge-select.status-entregue {
+    background-color: #f0fff4;
+    border-color: #68d391;
+    color: #22543d;
+}
+
+.status-badge-select.status-entregue:hover {
+    background-color: #c6f6d5;
+    border-color: #48bb78;
+}
+
+/* Responsividade para o status select */
+@media (max-width: 768px) {
+    .status-badge-select {
+        min-width: 120px;
+        font-size: 0.8em;
+        padding: 8px 10px;
+        padding-right: 26px;
+        background-size: 10px;
+        background-position: right 6px center;
+    }
+}
