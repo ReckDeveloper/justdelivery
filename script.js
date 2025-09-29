@@ -3,9 +3,11 @@ var deliveryTickets = [];
 var ticketIdCounter = 1;
 var pratosDisponiveis = [];
 var pratoIdCounter = 1;
+var itensAdicionais = [];
+var adicionalIdCounter = 1;
 
-// Preços dos itens adicionais
-var PRECOS_ADICIONAIS = {
+// Preços dos itens adicionais padrão
+var PRECOS_ADICIONAIS_PADRAO = {
     refrigerante: 5.00,
     sobremesa: 8.00,
     batata: 6.00
@@ -19,8 +21,8 @@ function initializeApp() {
     try {
         // Verificar se todos os elementos necessários existem
         var requiredElements = [
-            'deliveryForm', 'pratoForm', 'pratoPrincipal', 
-            'filtroStatus', 'filtroEntregador', 'pratosList', 'ticketsList'
+            'deliveryForm', 'pratoForm', 'adicionalForm', 'pratoPrincipal', 
+            'filtroStatus', 'filtroEntregador', 'pratosList', 'adicionaisList', 'ticketsList'
         ];
         
         var missingElements = [];
@@ -39,6 +41,7 @@ function initializeApp() {
         // Carregar dados salvos do localStorage
         loadTicketsFromStorage();
         loadPratosFromStorage();
+        loadItensAdicionaisFromStorage();
         
         // Configurar data e hora atuais por padrão
         setCurrentDateTime();
@@ -46,6 +49,7 @@ function initializeApp() {
         // Event listeners com verificação de existência
         var deliveryForm = document.getElementById('deliveryForm');
         var pratoForm = document.getElementById('pratoForm');
+        var adicionalForm = document.getElementById('adicionalForm');
         var pratoPrincipal = document.getElementById('pratoPrincipal');
         var filtroStatus = document.getElementById('filtroStatus');
         var filtroEntregador = document.getElementById('filtroEntregador');
@@ -56,6 +60,10 @@ function initializeApp() {
         
         if (pratoForm) {
             pratoForm.addEventListener('submit', handlePratoSubmit);
+        }
+        
+        if (adicionalForm) {
+            adicionalForm.addEventListener('submit', handleAdicionalSubmit);
         }
         
         if (pratoPrincipal) {
@@ -72,11 +80,17 @@ function initializeApp() {
         
         // Renderizar dados iniciais
         renderPratos();
+        renderItensAdicionais();
         renderTickets();
         
         // Carregar pratos padrão se não houver nenhum
         if (pratosDisponiveis.length === 0) {
             carregarPratosPadrao();
+        }
+        
+        // Carregar itens adicionais padrão se não houver nenhum
+        if (itensAdicionais.length === 0) {
+            carregarItensAdicionaisPadrao();
         }
         
         // Melhorias para dispositivos móveis
@@ -269,6 +283,40 @@ function carregarPratosPadrao() {
 }
 
 /**
+ * Carrega itens adicionais padrão do sistema
+ */
+function carregarItensAdicionaisPadrao() {
+    try {
+        var itensAdicionaisPadrao = [
+            { nome: "Refrigerante", preco: 5.00 },
+            { nome: "Sobremesa", preco: 8.00 },
+            { nome: "Batata Frita", preco: 6.00 },
+            { nome: "Suco Natural", preco: 4.50 },
+            { nome: "Salada", preco: 3.50 }
+        ];
+        
+        for (var i = 0; i < itensAdicionaisPadrao.length; i++) {
+            var item = itensAdicionaisPadrao[i];
+            itensAdicionais.push({
+                id: adicionalIdCounter++,
+                nome: item.nome,
+                preco: item.preco,
+                disponivel: true,
+                criadoEm: new Date().toISOString()
+            });
+        }
+        
+        saveItensAdicionaisToStorage();
+        renderItensAdicionais();
+        updateItensAdicionaisForm();
+        
+        console.log('Itens adicionais padrão carregados');
+    } catch (error) {
+        console.error('Erro ao carregar itens adicionais padrão:', error);
+    }
+}
+
+/**
  * Processa o envio do formulário de pratos
  */
 function handlePratoSubmit(event) {
@@ -344,6 +392,81 @@ function handlePratoSubmit(event) {
 }
 
 /**
+ * Processa o envio do formulário de itens adicionais
+ */
+function handleAdicionalSubmit(event) {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+    
+    try {
+        var nomeAdicional = '';
+        var precoAdicional = 0;
+        
+        var nomeInput = document.getElementById('nomeAdicional');
+        var precoInput = document.getElementById('precoAdicional');
+        
+        if (nomeInput) {
+            nomeAdicional = nomeInput.value ? nomeInput.value.trim() : '';
+        }
+        
+        if (precoInput) {
+            precoAdicional = precoInput.value ? parseFloat(precoInput.value) : 0;
+        }
+        
+        if (!nomeAdicional) {
+            showNotification('Nome do item adicional é obrigatório!', 'error');
+            return;
+        }
+        
+        if (precoAdicional <= 0) {
+            showNotification('Preço deve ser maior que zero!', 'error');
+            return;
+        }
+        
+        // Verificar se o item já existe
+        var itemExistente = false;
+        for (var i = 0; i < itensAdicionais.length; i++) {
+            if (itensAdicionais[i].nome.toLowerCase() === nomeAdicional.toLowerCase()) {
+                itemExistente = true;
+                break;
+            }
+        }
+        
+        if (itemExistente) {
+            showNotification('Este item adicional já existe!', 'error');
+            return;
+        }
+        
+        // Criar novo item adicional
+        var novoAdicional = {
+            id: adicionalIdCounter++,
+            nome: nomeAdicional,
+            preco: precoAdicional,
+            disponivel: true,
+            criadoEm: new Date().toISOString()
+        };
+        
+        itensAdicionais.push(novoAdicional);
+        saveItensAdicionaisToStorage();
+        
+        // Limpar formulário
+        if (nomeInput) nomeInput.value = '';
+        if (precoInput) precoInput.value = '';
+        
+        // Renderizar itens atualizados
+        renderItensAdicionais();
+        updateItensAdicionaisForm();
+        
+        showNotification('Item adicional adicionado!', 'success');
+        
+    } catch (error) {
+        console.error('Erro ao adicionar item adicional:', error);
+        showNotification('Erro ao adicionar item adicional: ' + error.message, 'error');
+    }
+}
+
+/**
  * Renderiza a lista de pratos disponíveis
  */
 function renderPratos() {
@@ -385,6 +508,46 @@ function renderPratos() {
 }
 
 /**
+ * Renderiza a lista de itens adicionais disponíveis
+ */
+function renderItensAdicionais() {
+    var adicionaisList = document.getElementById('adicionaisList');
+    
+    if (!adicionaisList) {
+        console.error('Elemento adicionaisList não encontrado');
+        return;
+    }
+    
+    if (itensAdicionais.length === 0) {
+        adicionaisList.innerHTML = '<div class="empty-adicionais">Nenhum item adicional cadastrado. Adicione itens ao menu.</div>';
+        return;
+    }
+    
+    // Ordenar itens por nome
+    var itensOrdenados = itensAdicionais.slice().sort(function(a, b) {
+        return a.nome.localeCompare(b.nome);
+    });
+    
+    var html = '';
+    for (var i = 0; i < itensOrdenados.length; i++) {
+        var item = itensOrdenados[i];
+        var statusClass = item.disponivel ? 'adicional-disponivel' : 'adicional-indisponivel';
+        
+        html += '<div class="adicional-card ' + statusClass + '">';
+        html += '<div class="adicional-nome">' + item.nome + '</div>';
+        html += '<div class="adicional-preco">R$ ' + item.preco.toFixed(2) + '</div>';
+        html += '<div class="adicional-actions">';
+        html += '<button class="btn-remove-adicional" onclick="removeAdicional(' + item.id + ')">';
+        html += '🗑️ Remover';
+        html += '</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    adicionaisList.innerHTML = html;
+}
+
+/**
  * Remove um prato do cardápio
  */
 function removePrato(pratoId) {
@@ -400,6 +563,24 @@ function removePrato(pratoId) {
         updatePratoSelect();
         
         showNotification('Prato removido do cardápio!', 'success');
+    }
+}
+
+/**
+ * Remove um item adicional
+ */
+function removeAdicional(adicionalId) {
+    var confirmacao = window.confirm('Tem certeza que deseja remover este item adicional?');
+    
+    if (confirmacao) {
+        itensAdicionais = itensAdicionais.filter(function(item) {
+            return item.id !== adicionalId;
+        });
+        saveItensAdicionaisToStorage();
+        renderItensAdicionais();
+        updateItensAdicionaisForm();
+        
+        showNotification('Item adicional removido!', 'success');
     }
 }
 

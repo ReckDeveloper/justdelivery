@@ -270,6 +270,29 @@
             </div>
         </div>
         
+        <!-- Seção de Itens Adicionais -->
+        <div class="section">
+            <h2>Itens Adicionais</h2>
+            
+            <form id="adicionalForm" onsubmit="adicionarAdicional(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nomeAdicional">Nome do Item:</label>
+                        <input type="text" id="nomeAdicional" placeholder="Ex: Refrigerante, Sobremesa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="precoAdicional">Preço (R$):</label>
+                        <input type="number" id="precoAdicional" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                    <button type="submit">+ Adicionar</button>
+                </div>
+            </form>
+            
+            <div id="adicionaisList">
+                <p style="text-align: center; color: #666; padding: 20px;">Carregando itens adicionais...</p>
+            </div>
+        </div>
+        
         <!-- Seção de Novo Ticket -->
         <div class="section">
             <h2>Novo Ticket de Entrega</h2>
@@ -289,19 +312,8 @@
                 
                 <div class="form-group">
                     <label>Itens Adicionais:</label>
-                    <div style="padding: 10px 0;">
-                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="checkbox" id="refrigerante" value="refrigerante" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
-                            Refrigerante (+R$ 5,00)
-                        </label>
-                        <label style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <input type="checkbox" id="sobremesa" value="sobremesa" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
-                            Sobremesa (+R$ 8,00)
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input type="checkbox" id="batata" value="batata" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">
-                            Batata Frita (+R$ 6,00)
-                        </label>
+                    <div id="itensAdicionaisContainer" style="padding: 10px 0;">
+                        <!-- Itens adicionais serão carregados dinamicamente aqui -->
                     </div>
                 </div>
                 
@@ -348,8 +360,9 @@
         // Variáveis globais
         var APP_PRATOS = [];
         var APP_TICKETS = [];
+        var APP_ADICIONAIS = [];
         
-        var ADICIONAIS = {
+        var ADICIONAIS_PADRAO = {
             refrigerante: { nome: 'Refrigerante', preco: 5.00 },
             sobremesa: { nome: 'Sobremesa', preco: 8.00 },
             batata: { nome: 'Batata Frita', preco: 6.00 }
@@ -385,7 +398,8 @@
                 if (testarStorage()) {
                     localStorage.setItem('app_pratos', JSON.stringify(APP_PRATOS));
                     localStorage.setItem('app_tickets', JSON.stringify(APP_TICKETS));
-                    log('Dados salvos: ' + APP_PRATOS.length + ' pratos, ' + APP_TICKETS.length + ' tickets');
+                    localStorage.setItem('app_adicionais', JSON.stringify(APP_ADICIONAIS));
+                    log('Dados salvos: ' + APP_PRATOS.length + ' pratos, ' + APP_TICKETS.length + ' tickets, ' + APP_ADICIONAIS.length + ' adicionais');
                 } else {
                     log('AVISO: localStorage indisponível');
                 }
@@ -400,6 +414,7 @@
                 if (testarStorage()) {
                     var pratos = localStorage.getItem('app_pratos');
                     var tickets = localStorage.getItem('app_tickets');
+                    var adicionais = localStorage.getItem('app_adicionais');
                     
                     if (pratos) {
                         APP_PRATOS = JSON.parse(pratos);
@@ -410,11 +425,17 @@
                         APP_TICKETS = JSON.parse(tickets);
                         log('Tickets carregados: ' + APP_TICKETS.length);
                     }
+                    
+                    if (adicionais) {
+                        APP_ADICIONAIS = JSON.parse(adicionais);
+                        log('Adicionais carregados: ' + APP_ADICIONAIS.length);
+                    }
                 }
             } catch (e) {
                 log('ERRO ao carregar: ' + e.message);
                 APP_PRATOS = [];
                 APP_TICKETS = [];
+                APP_ADICIONAIS = [];
             }
         }
 
@@ -428,6 +449,12 @@
                 { id: 3, nome: 'Hambúrguer artesanal', preco: 25.00 },
                 { id: 4, nome: 'Pizza margherita', preco: 28.00 },
                 { id: 5, nome: 'Salada caesar', preco: 16.00 }
+            ];
+            
+            APP_ADICIONAIS = [
+                { id: 1, nome: 'Refrigerante', preco: 5.00, ativo: true },
+                { id: 2, nome: 'Sobremesa', preco: 8.00, ativo: true },
+                { id: 3, nome: 'Batata Frita', preco: 6.00, ativo: true }
             ];
             
             APP_TICKETS = [];
@@ -463,6 +490,37 @@
             log('Pratos renderizados!');
         }
 
+        // Renderizar itens adicionais
+        function renderizarAdicionais() {
+            log('Renderizando ' + APP_ADICIONAIS.length + ' itens adicionais...');
+            
+            var container = document.getElementById('adicionaisList');
+            if (!container) {
+                log('ERRO: Container adicionaisList não encontrado');
+                return;
+            }
+
+            if (APP_ADICIONAIS.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Nenhum item adicional cadastrado</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < APP_ADICIONAIS.length; i++) {
+                var adicional = APP_ADICIONAIS[i];
+                var statusClass = adicional.ativo ? '' : 'style="opacity: 0.6;"';
+                html += '<div class="prato-item" ' + statusClass + '>';
+                html += '<span><strong>' + adicional.nome + '</strong><br>R$ ' + adicional.preco.toFixed(2);
+                html += adicional.ativo ? ' (Ativo)' : ' (Inativo)';
+                html += '</span>';
+                html += '<button onclick="removerAdicional(' + i + ')">Remover</button>';
+                html += '</div>';
+            }
+            
+            container.innerHTML = html;
+            log('Itens adicionais renderizados!');
+        }
+
         // Atualizar select
         function atualizarSelect() {
             log('Atualizando select com ' + APP_PRATOS.length + ' pratos...');
@@ -480,6 +538,41 @@
             
             select.innerHTML = html;
             log('Select atualizado!');
+        }
+
+        // Atualizar itens adicionais no formulário
+        function atualizarItensAdicionaisForm() {
+            log('Atualizando itens adicionais no formulário...');
+            
+            var container = document.getElementById('itensAdicionaisContainer');
+            if (!container) {
+                log('ERRO: Container itensAdicionaisContainer não encontrado');
+                return;
+            }
+
+            if (APP_ADICIONAIS.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666; padding: 10px;">Nenhum item adicional disponível</p>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < APP_ADICIONAIS.length; i++) {
+                var adicional = APP_ADICIONAIS[i];
+                if (adicional.ativo) {
+                    var id = 'adicional_' + adicional.id;
+                    html += '<label style="display: flex; align-items: center; margin-bottom: 10px;">';
+                    html += '<input type="checkbox" id="' + id + '" value="' + adicional.id + '" style="width: auto; margin-right: 10px;" onchange="atualizarValor()">';
+                    html += adicional.nome + ' (+R$ ' + adicional.preco.toFixed(2) + ')';
+                    html += '</label>';
+                }
+            }
+            
+            if (html === '') {
+                html = '<p style="text-align: center; color: #666; padding: 10px;">Nenhum item adicional ativo</p>';
+            }
+            
+            container.innerHTML = html;
+            log('Itens adicionais do formulário atualizados!');
         }
 
         // Adicionar prato
@@ -511,6 +604,44 @@
             log('Prato adicionado: ' + nome);
         }
 
+        // Adicionar item adicional
+        function adicionarAdicional(event) {
+            event.preventDefault();
+            log('Adicionando novo item adicional...');
+            
+            var nome = document.getElementById('nomeAdicional').value.trim();
+            var preco = parseFloat(document.getElementById('precoAdicional').value);
+            
+            if (!nome || isNaN(preco) || preco <= 0) {
+                alert('Preencha nome e preço válidos!');
+                return;
+            }
+            
+            // Verificar se já existe
+            for (var i = 0; i < APP_ADICIONAIS.length; i++) {
+                if (APP_ADICIONAIS[i].nome.toLowerCase() === nome.toLowerCase()) {
+                    alert('Este item adicional já existe!');
+                    return;
+                }
+            }
+            
+            APP_ADICIONAIS.push({
+                id: Date.now(),
+                nome: nome,
+                preco: preco,
+                ativo: true
+            });
+            
+            document.getElementById('nomeAdicional').value = '';
+            document.getElementById('precoAdicional').value = '';
+            
+            salvarDados();
+            renderizarAdicionais();
+            atualizarItensAdicionaisForm();
+            
+            log('Item adicional adicionado: ' + nome);
+        }
+
         // Remover prato
         function removerPrato(index) {
             if (index >= 0 && index < APP_PRATOS.length) {
@@ -520,6 +651,18 @@
                 renderizarPratos();
                 atualizarSelect();
                 log('Prato removido: ' + nome);
+            }
+        }
+
+        // Remover item adicional
+        function removerAdicional(index) {
+            if (index >= 0 && index < APP_ADICIONAIS.length) {
+                var nome = APP_ADICIONAIS[index].nome;
+                APP_ADICIONAIS.splice(index, 1);
+                salvarDados();
+                renderizarAdicionais();
+                atualizarItensAdicionaisForm();
+                log('Item adicional removido: ' + nome);
             }
         }
 
@@ -537,10 +680,17 @@
                 total = APP_PRATOS[index].preco;
             }
             
-            // Adicionar itens extras
-            if (document.getElementById('refrigerante').checked) total += 5.00;
-            if (document.getElementById('sobremesa').checked) total += 8.00;
-            if (document.getElementById('batata').checked) total += 6.00;
+            // Adicionar itens extras selecionados
+            var checkboxes = document.querySelectorAll('#itensAdicionaisContainer input[type="checkbox"]:checked');
+            for (var i = 0; i < checkboxes.length; i++) {
+                var adicionalId = parseInt(checkboxes[i].value);
+                for (var j = 0; j < APP_ADICIONAIS.length; j++) {
+                    if (APP_ADICIONAIS[j].id === adicionalId) {
+                        total += APP_ADICIONAIS[j].preco;
+                        break;
+                    }
+                }
+            }
             
             valorInput.value = total > 0 ? 'R$ ' + total.toFixed(2) : '';
         }
@@ -567,14 +717,18 @@
             }
             
             var adicionais = [];
-            if (document.getElementById('refrigerante').checked) {
-                adicionais.push(ADICIONAIS.refrigerante);
-            }
-            if (document.getElementById('sobremesa').checked) {
-                adicionais.push(ADICIONAIS.sobremesa);
-            }
-            if (document.getElementById('batata').checked) {
-                adicionais.push(ADICIONAIS.batata);
+            var checkboxes = document.querySelectorAll('#itensAdicionaisContainer input[type="checkbox"]:checked');
+            for (var i = 0; i < checkboxes.length; i++) {
+                var adicionalId = parseInt(checkboxes[i].value);
+                for (var j = 0; j < APP_ADICIONAIS.length; j++) {
+                    if (APP_ADICIONAIS[j].id === adicionalId) {
+                        adicionais.push({
+                            nome: APP_ADICIONAIS[j].nome,
+                            preco: APP_ADICIONAIS[j].preco
+                        });
+                        break;
+                    }
+                }
             }
             
             var valorTotal = APP_PRATOS[pratoIndex].preco;
@@ -690,7 +844,9 @@
             
             log('3. Renderizando interface...');
             renderizarPratos();
+            renderizarAdicionais();
             atualizarSelect();
+            atualizarItensAdicionaisForm();
             renderizarTickets();
             
             log('4. Definindo data atual...');
@@ -704,7 +860,9 @@
             log('Forçando carregamento de dados...');
             carregarExemplo();
             renderizarPratos();
+            renderizarAdicionais();
             atualizarSelect();
+            atualizarItensAdicionaisForm();
             renderizarTickets();
             alert('Dados forçados!');
         }
@@ -712,13 +870,17 @@
         function limparTudo() {
             log('Limpando todos os dados...');
             APP_PRATOS = [];
+            APP_ADICIONAIS = [];
             APP_TICKETS = [];
             if (testarStorage()) {
                 localStorage.removeItem('app_pratos');
+                localStorage.removeItem('app_adicionais');
                 localStorage.removeItem('app_tickets');
             }
             renderizarPratos();
+            renderizarAdicionais();
             atualizarSelect();
+            atualizarItensAdicionaisForm();
             renderizarTickets();
             alert('Dados limpos!');
         }
@@ -728,20 +890,25 @@
             info += 'User Agent: ' + navigator.userAgent + '\n\n';
             info += 'Dados em memória:\n';
             info += '• Pratos: ' + APP_PRATOS.length + '\n';
+            info += '• Itens Adicionais: ' + APP_ADICIONAIS.length + '\n';
             info += '• Tickets: ' + APP_TICKETS.length + '\n\n';
             info += 'LocalStorage:\n';
             info += '• Disponível: ' + testarStorage() + '\n';
             
             if (testarStorage()) {
                 var pratos = localStorage.getItem('app_pratos');
+                var adicionais = localStorage.getItem('app_adicionais');
                 var tickets = localStorage.getItem('app_tickets');
                 info += '• Pratos salvos: ' + (pratos ? JSON.parse(pratos).length : 0) + '\n';
+                info += '• Adicionais salvos: ' + (adicionais ? JSON.parse(adicionais).length : 0) + '\n';
                 info += '• Tickets salvos: ' + (tickets ? JSON.parse(tickets).length : 0) + '\n';
             }
             
             info += '\nElementos DOM:\n';
             info += '• pratosList: ' + (document.getElementById('pratosList') ? 'OK' : 'ERRO') + '\n';
+            info += '• adicionaisList: ' + (document.getElementById('adicionaisList') ? 'OK' : 'ERRO') + '\n';
             info += '• pratoPrincipal: ' + (document.getElementById('pratoPrincipal') ? 'OK' : 'ERRO') + '\n';
+            info += '• itensAdicionaisContainer: ' + (document.getElementById('itensAdicionaisContainer') ? 'OK' : 'ERRO') + '\n';
             info += '• ticketsList: ' + (document.getElementById('ticketsList') ? 'OK' : 'ERRO') + '\n';
             
             alert(info);
@@ -762,9 +929,24 @@
                     carregarExemplo();
                 }
                 
+                if (APP_ADICIONAIS.length === 0) {
+                    log('Nenhum item adicional encontrado, carregando padrão...');
+                    // Se não carregou do exemplo, criar os padrão
+                    if (APP_PRATOS.length > 0) {
+                        APP_ADICIONAIS = [
+                            { id: 1, nome: 'Refrigerante', preco: 5.00, ativo: true },
+                            { id: 2, nome: 'Sobremesa', preco: 8.00, ativo: true },
+                            { id: 3, nome: 'Batata Frita', preco: 6.00, ativo: true }
+                        ];
+                        salvarDados();
+                    }
+                }
+                
                 log('3. Renderizando interface...');
                 renderizarPratos();
+                renderizarAdicionais();
                 atualizarSelect();
+                atualizarItensAdicionaisForm();
                 renderizarTickets();
                 
                 log('4. Definindo data atual...');
@@ -772,6 +954,7 @@
                 
                 log('=== SISTEMA INICIADO COM SUCESSO ===');
                 log('Pratos disponíveis: ' + APP_PRATOS.length);
+                log('Itens adicionais: ' + APP_ADICIONAIS.length);
                 log('Tickets existentes: ' + APP_TICKETS.length);
                 
                 // Ocultar debug após 5 segundos
@@ -797,7 +980,9 @@
         
         // Expor funções globalmente
         window.adicionarPrato = adicionarPrato;
+        window.adicionarAdicional = adicionarAdicional;
         window.removerPrato = removerPrato;
+        window.removerAdicional = removerAdicional;
         window.criarTicket = criarTicket;
         window.removerTicket = removerTicket;
         window.atualizarValor = atualizarValor;
